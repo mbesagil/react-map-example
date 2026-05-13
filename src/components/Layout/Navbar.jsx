@@ -7,16 +7,29 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
+import MenuIcon from '@mui/icons-material/Menu';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
-const Navbar = ({ isSatellite, onToggle }) => {
+const Navbar = ({ isSatellite, onToggle, onMenuClick }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1a1a1a', boxShadow: 'none', borderBottom: '1px solid #333' }}>
       <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
+        {isMobile && (
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={onMenuClick}
+            sx={{ mr: 1 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+        
         <MapIcon sx={{ mr: { xs: 1, sm: 2 }, color: '#1976d2' }} />
         
         <Typography 
@@ -26,10 +39,10 @@ const Navbar = ({ isSatellite, onToggle }) => {
             flexGrow: 1, 
             fontWeight: 'bold', 
             letterSpacing: '0.5px',
-            fontSize: { xs: '1rem', sm: '1.25rem' }
+            fontSize: { xs: '0.9rem', sm: '1.25rem' }
           }}
         >
-          {isMobile ? 'Map Explorer' : 'React Map Explorer'}
+          {isMobile ? 'Vehicle Tracker' : 'React Vehicle Management System'}
         </Typography>
 
         <Box>

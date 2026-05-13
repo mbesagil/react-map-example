@@ -1,8 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { calculateNextPosition } from '../utils/movement';
 
+const KONYA_COORDS = { lat: 37.8714, lng: 32.4846 };
+
 const useVehicles = () => {
-  const [vehicles, setVehicles] = useState([]);
+  const [vehicles, setVehicles] = useState([
+    {
+      id: 1,
+      name: 'Konya Express',
+      plate: '42 ABC 42',
+      status: 'idle',
+      speed: 60,
+      position: KONYA_COORDS,
+      target: null
+    }
+  ]);
   const [selectedVehicleId, setSelectedVehicleId] = useState(null);
 
   const addVehicle = (vehicleData) => {
