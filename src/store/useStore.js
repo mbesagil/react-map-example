@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { calculateNextPosition } from '../utils/movement';
 
 const TILE_LAYERS = {
@@ -11,18 +12,16 @@ const KONYA_COORDS = { lat: 37.8714, lng: 32.4846 };
 // --- MAP SLICE ---
 const createMapSlice = (set, get) => ({
   tileType: 'standard',
-  toggleTile: () => set((state) => ({ 
-    tileType: state.tileType === 'standard' ? 'satellite' : 'standard' 
-  })),
+  darkMode: false, 
+  toggleTile: () => set((state) => ({ tileType: state.tileType === 'standard' ? 'satellite' : 'standard' })),
+  toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
   getTileUrl: () => TILE_LAYERS[get().tileType],
   getIsSatellite: () => get().tileType === 'satellite',
 });
 
 // --- VEHICLE SLICE ---
 const createVehicleSlice = (set, get) => ({
-  vehicles: [
-    { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }
-  ],
+  vehicles: [{ id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }],
   selectedVehicleId: null,
   selectVehicle: (id) => set((state) => ({ selectedVehicleId: state.selectedVehicleId === id ? null : id })),
   addVehicle: (vehicleData) => set((state) => ({
@@ -55,37 +54,28 @@ const createRegionSlice = (set, get) => ({
   searchResults: [],
   selectedRegion: null,
   regionLoading: false,
-  
-  // Handlers
   setRegionLoading: (loading) => set({ regionLoading: loading }),
   setSearchResults: (results) => set({ searchResults: results }),
-  
-  // Select Search Region (replaces everything else)
-  selectRegion: (region) => set({ 
-    selectedRegion: {
-      ...region,
-      source: 'search' // Tag the source
-    }, 
-    searchResults: [] 
-  }),
-
-  // Set Manually Drawn Polygon (replaces everything else)
+  selectRegion: (region) => set({ selectedRegion: { ...region, source: 'search' }, searchResults: [] }),
   setDrawnPolygon: (geojson) => set({
-    selectedRegion: {
-      display_name: 'Manually Drawn Area',
-      geojson: geojson,
-      source: 'draw',
-      place_id: 'manual-' + Date.now()
-    },
+    selectedRegion: { display_name: 'Manually Drawn Area', geojson: geojson, source: 'draw', place_id: 'manual-' + Date.now() },
     searchResults: []
   }),
-
   clearRegion: () => set({ selectedRegion: null, searchResults: [] }),
 });
 
-// --- UNIFIED STORE ---
-export const useStore = create((...a) => ({
-  ...createMapSlice(...a),
-  ...createVehicleSlice(...a),
-  ...createRegionSlice(...a),
-}));
+// --- UNIFIED STORE WITH PERSISTENCE ---
+export const useStore = create(
+  persist(
+    (set, get, api) => ({
+      ...createMapSlice(set, get),
+      ...createVehicleSlice(set, get),
+      ...createRegionSlice(set, get),
+    }),
+    {
+      name: 'vehicle-tracker-settings', // storage key
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ darkMode: state.darkMode }), // ONLY persist darkMode
+    }
+  )
+);

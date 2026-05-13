@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, List, Divider } from '@mui/material';
+import { Box, Typography, Button, List, Divider, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VehicleItem from './VehicleItem';
 import AddVehicleDialog from './AddVehicleDialog';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const VehiclePanel = ({ onSelectVehicle, children }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const vehicles = useStore(state => state.vehicles);
   const addVehicle = useStore(state => state.addVehicle);
@@ -20,8 +21,15 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
   };
 
   return (
-    <Box sx={{ width: 320, height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'white', borderRight: '1px solid #ddd' }}>
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: '#f8f9fa' }}>
+    <Box sx={{ 
+      width: 320, 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      bgcolor: theme.palette.background.paper, // Use theme color
+      borderRight: `1px solid ${theme.palette.divider}`
+    }}>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
         <div className="flex justify-between items-center">
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t('vehicles')}</Typography>
           <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={() => setIsDialogOpen(true)}>{t('add')}</Button>

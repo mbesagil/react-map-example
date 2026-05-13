@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid, useTheme } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import GpsOffIcon from '@mui/icons-material/GpsOff';
@@ -22,6 +22,7 @@ const StatCard = ({ title, value, icon, color }) => (
 
 const GeoFencePanel = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const vehicles = useStore(state => state.vehicles);
   const selectedRegion = useStore(state => state.selectedRegion);
 
@@ -40,9 +41,14 @@ const GeoFencePanel = () => {
   if (!selectedRegion || !stats) return null;
 
   return (
-    <Box sx={{ mt: 1, p: 1.5, bgcolor: '#f0f4f8', borderRadius: 2 }}>
+    <Box sx={{ 
+      mt: 1, 
+      p: 1.5, 
+      bgcolor: theme.palette.mode === 'dark' ? 'rgba(25, 118, 210, 0.1)' : '#f0f4f8', 
+      borderRadius: 2 
+    }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-        <AssessmentIcon sx={{ mr: 1, color: '#1976d2', fontSize: 20 }} />
+        <AssessmentIcon sx={{ mr: 1, color: theme.palette.primary.main, fontSize: 20 }} />
         <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{t('analytics')}: {selectedRegion.display_name.split(',')[0]}</Typography>
       </Box>
       <Grid container spacing={1}>
@@ -53,7 +59,7 @@ const GeoFencePanel = () => {
           <StatCard title={t('outside')} value={stats.outsideCount} icon={<GpsOffIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />} color="#9e9e9e" />
         </Grid>
         <Grid item="true" xs={6}>
-          <StatCard title={t('moving')} value={stats.movingInside} icon={<PlayCircleFilledIcon sx={{ fontSize: 16, color: '#2e7d32' }} />} color="#2e7d32" />
+          <StatCard title={t('moving')} value={stats.movingInside} icon={<PlayCircleFilledIcon sx={{ fontSize: 16, color: '#4caf50' }} />} color="#4caf50" />
         </Grid>
         <Grid item="true" xs={6}>
           <StatCard title={t('idle')} value={stats.idleInside} icon={<PauseCircleFilledIcon sx={{ fontSize: 16, color: '#ed6c02' }} />} color="#ed6c02" />
