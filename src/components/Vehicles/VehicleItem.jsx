@@ -88,18 +88,18 @@ const VehicleItem = ({
           </ListItemAvatar>
           <ListItemText
             primary={
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehicle.name}</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+              <Box component="span" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>{vehicle.name}</Typography>
+                <Typography component="span" variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
                   {vehicle.speed} km/h
                 </Typography>
               </Box>
             }
             secondary={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.2 }}>
-                <Typography variant="caption" color="text.secondary">{vehicle.plate}</Typography>
+              <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.2 }}>
+                <Typography component="span" variant="caption" color="text.secondary">{vehicle.plate}</Typography>
                 <FiberManualRecordIcon sx={{ fontSize: 8, color: getStatusColor(vehicle.status) }} />
-                <Typography variant="caption" sx={{ color: getStatusColor(vehicle.status), fontWeight: 500 }}>
+                <Typography component="span" variant="caption" sx={{ color: getStatusColor(vehicle.status), fontWeight: 500 }}>
                   {t(vehicle.status)}
                 </Typography>
               </Box>

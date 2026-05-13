@@ -78,9 +78,11 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
               type="number"
               value={bulkSpeed}
               onChange={(e) => setBulkSpeed(e.target.value)}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><SpeedIcon fontSize="small" /></InputAdornment>,
-                endAdornment: <InputAdornment position="end">km/h</InputAdornment>,
+              slotProps={{
+                input: {
+                  startAdornment: <InputAdornment position="start"><SpeedIcon fontSize="small" /></InputAdornment>,
+                  endAdornment: <InputAdornment position="end">km/h</InputAdornment>,
+                }
               }}
               sx={{ flex: 1 }}
             />

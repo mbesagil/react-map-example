@@ -97,12 +97,14 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder={t('vehicle_name_placeholder')}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CarIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <CarIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }
                 }}
               />
             </Grid>
@@ -115,12 +117,14 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 value={formData.plate}
                 onChange={handleChange}
                 placeholder={t('plate_placeholder')}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <BadgeIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <BadgeIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }
                 }}
               />
             </Grid>
@@ -135,12 +139,14 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <TypeIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <TypeIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }
                 }}
               >
                 <MenuItem value="car">{t('car')}</MenuItem>
@@ -159,13 +165,15 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 value={formData.speed}
                 onChange={handleChange}
                 placeholder={t('speed_placeholder')}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SpeedIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: <InputAdornment position="end">km/h</InputAdornment>
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SpeedIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: <InputAdornment position="end">km/h</InputAdornment>
+                  }
                 }}
               />
             </Grid>
@@ -186,16 +194,15 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 label={t('latitude')}
                 name="latitude"
                 type="number"
-                inputProps={{ step: "any" }}
-                value={formData.latitude}
-                onChange={handleChange}
-                placeholder={t('latitude_placeholder')}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LocationIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  htmlInput: { step: "any" },
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LocationIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }
                 }}
               />
             </Grid>
@@ -206,16 +213,15 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 label={t('longitude')}
                 name="longitude"
                 type="number"
-                inputProps={{ step: "any" }}
-                value={formData.longitude}
-                onChange={handleChange}
-                placeholder={t('longitude_placeholder')}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LocationIcon color="action" fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  htmlInput: { step: "any" },
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LocationIcon color="action" fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }
                 }}
               />
             </Grid>
