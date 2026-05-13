@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import VehicleItem from './VehicleItem';
 import AddVehicleDialog from './AddVehicleDialog';
 
-const VehiclePanel = ({ vehicles, onAddVehicle, selectedVehicleId, onSelectVehicle }) => {
+const VehiclePanel = ({ vehicles, onAddVehicle, selectedVehicleId, onSelectVehicle, children }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -30,6 +30,11 @@ const VehiclePanel = ({ vehicles, onAddVehicle, selectedVehicleId, onSelectVehic
             Click on map to set target for selected vehicle
           </Typography>
         )}
+        
+        {/* Slot for Region Search */}
+        <Box sx={{ mt: 2 }}>
+          {children}
+        </Box>
       </Box>
       <Divider />
       

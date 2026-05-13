@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 
-// Function to create custom SVG markers with dynamic colors
+// Function to create custom SVG markers
 const createCustomIcon = (color) => {
   return L.divIcon({
     html: `
@@ -18,51 +18,50 @@ const createCustomIcon = (color) => {
   });
 };
 
-// Define colors
 const COLORS = {
   GRAY: '#9e9e9e',
   BLUE: '#1976d2',
-  GREEN: '#4caf50'
+  GREEN: '#4caf50',
+  REGION: '#ff5722'
 };
 
-// Component to handle map clicks
 const MapClickHandler = ({ onMapClick }) => {
   useMapEvents({
-    click: (e) => {
-      onMapClick(e.latlng.lat, e.latlng.lng);
-    },
+    click: (e) => onMapClick(e.latlng.lat, e.latlng.lng),
   });
   return null;
 };
 
-// Component to center map ONLY on selection
 const CenterMap = ({ position, selectedVehicleId }) => {
   const map = useMap();
   const prevIdRef = useRef();
-
   useEffect(() => {
-    // Only flyTo if the selection has actually changed
     if (position && selectedVehicleId !== prevIdRef.current) {
-      map.flyTo([position.lat, position.lng], map.getZoom(), {
-        animate: true,
-        duration: 1.5
-      });
+      map.flyTo([position.lat, position.lng], map.getZoom(), { animate: true, duration: 1.5 });
       prevIdRef.current = selectedVehicleId;
     }
   }, [position, selectedVehicleId, map]);
-
   return null;
 };
 
-const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget }) => {
-  const position = [39.9208, 32.8541]; // Turkey center
-  
+// Component to fit bounds to a selected region
+const FitRegionBounds = ({ geojson }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (geojson) {
+      const layer = L.geoJSON(geojson);
+      map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
+    }
+  }, [geojson, map]);
+  return null;
+};
+
+const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget, selectedRegion }) => {
+  const position = [39.9208, 32.8541];
   const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId);
 
   const handleMapClick = (lat, lng) => {
-    if (selectedVehicleId) {
-      onSetTarget(selectedVehicleId, lat, lng);
-    }
+    if (selectedVehicleId) onSetTarget(selectedVehicleId, lat, lng);
   };
 
   const getVehicleColor = (vehicle) => {
@@ -85,38 +84,39 @@ const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget }) =
       />
 
       <MapClickHandler onMapClick={handleMapClick} />
+      {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
       
-      {/* Auto-center logic - now only on selection change */}
-      {selectedVehicle && (
-        <CenterMap 
-          position={selectedVehicle.position} 
-          selectedVehicleId={selectedVehicleId} 
-        />
+      {/* Region Boundary Rendering */}
+      {selectedRegion?.geojson && (
+        <>
+          <GeoJSON 
+            data={selectedRegion.geojson} 
+            style={{
+              color: COLORS.REGION,
+              weight: 3,
+              opacity: 0.7,
+              fillColor: COLORS.REGION,
+              fillOpacity: 0.1
+            }}
+          />
+          <FitRegionBounds geojson={selectedRegion.geojson} />
+        </>
       )}
 
       {vehicles?.map((vehicle) => {
         const isSelected = vehicle.id === selectedVehicleId;
         const color = getVehicleColor(vehicle);
-        const icon = createCustomIcon(color);
-        
         return (
           <React.Fragment key={vehicle.id}>
             {vehicle.target && (
               <Polyline 
-                positions={[
-                  [vehicle.position.lat, vehicle.position.lng],
-                  [vehicle.target.lat, vehicle.target.lng]
-                ]}
+                positions={[[vehicle.position.lat, vehicle.position.lng], [vehicle.target.lat, vehicle.target.lng]]}
                 color={isSelected ? "#1976d2" : "#666"}
                 dashArray="5, 10"
                 weight={2}
               />
             )}
-
-            <Marker 
-              position={[vehicle.position.lat, vehicle.position.lng]}
-              icon={icon}
-            >
+            <Marker position={[vehicle.position.lat, vehicle.position.lng]} icon={createCustomIcon(color)}>
               <Popup>
                 <div className="p-1">
                   <h3 className="font-bold text-lg" style={{ color }}>{vehicle.name} {isSelected && "(Selected)"}</h3>
