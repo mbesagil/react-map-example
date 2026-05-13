@@ -41,27 +41,27 @@ const GeoFencePanel = () => {
   if (!selectedRegion || !stats) return null;
 
   return (
-    <Box sx={{ 
-      mt: 1, 
-      p: 1.5, 
-      bgcolor: theme.palette.mode === 'dark' ? 'rgba(25, 118, 210, 0.1)' : '#f0f4f8', 
-      borderRadius: 2 
+    <Box sx={{
+      mt: 1,
+      p: 1.5,
+      bgcolor: theme.palette.mode === 'dark' ? 'rgba(25, 118, 210, 0.1)' : '#f0f4f8',
+      borderRadius: 2
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
         <AssessmentIcon sx={{ mr: 1, color: theme.palette.primary.main, fontSize: 20 }} />
         <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{t('analytics')}: {selectedRegion.display_name.split(',')[0]}</Typography>
       </Box>
       <Grid container spacing={1}>
-        <Grid item="true" xs={6}>
+        <Grid item="true" size={{ xs: 6 }}>
           <StatCard title={t('inside')} value={stats.insideCount} icon={<GpsFixedIcon sx={{ fontSize: 16, color: '#4caf50' }} />} color="#4caf50" />
         </Grid>
-        <Grid item="true" xs={6}>
+        <Grid item="true" size={{ xs: 6 }}>
           <StatCard title={t('outside')} value={stats.outsideCount} icon={<GpsOffIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />} color="#9e9e9e" />
         </Grid>
-        <Grid item="true" xs={6}>
+        <Grid item="true" size={{ xs: 6 }}>
           <StatCard title={t('moving')} value={stats.movingInside} icon={<PlayCircleFilledIcon sx={{ fontSize: 16, color: '#4caf50' }} />} color="#4caf50" />
         </Grid>
-        <Grid item="true" xs={6}>
+        <Grid item="true" size={{ xs: 6 }}>
           <StatCard title={t('idle')} value={stats.idleInside} icon={<PauseCircleFilledIcon sx={{ fontSize: 16, color: '#ed6c02' }} />} color="#ed6c02" />
         </Grid>
       </Grid>

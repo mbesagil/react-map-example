@@ -69,7 +69,7 @@ const CenterMap = ({ position, selectedVehicleId }) => {
   const prevIdRef = useRef();
   useEffect(() => {
     if (position && selectedVehicleId && selectedVehicleId !== prevIdRef.current) {
-      map.flyTo([position.lat, position.lng], map.getZoom(), { animate: true, duration: 1.5 });
+      map.flyTo([position.lat, position.lng], 14, { animate: true, duration: 1.5 });
       prevIdRef.current = selectedVehicleId;
     }
     if (!selectedVehicleId) prevIdRef.current = null;

@@ -14,7 +14,7 @@ const RegionSearchBar = () => {
 
   // Debounced Search Logic
   useEffect(() => {
-    if (!query || query.length < 3) {
+    if (!query || query.length < 3 || query === selectedRegion?.display_name) {
       setSearchResults([]);
       setHasSearched(false);
       return;
@@ -36,7 +36,7 @@ const RegionSearchBar = () => {
     }, 600);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, setSearchResults, setRegionLoading]);
+  }, [query, setSearchResults, setRegionLoading, selectedRegion]);
 
   const handleClearInput = () => {
     setQuery('');
