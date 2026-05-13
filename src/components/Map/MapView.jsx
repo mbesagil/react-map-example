@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Function to create custom SVG markers
+// Custom SVG Icon Generator
 const createCustomIcon = (color) => {
   return L.divIcon({
     html: `
@@ -25,6 +25,7 @@ const COLORS = {
   REGION: '#ff5722'
 };
 
+// Component to handle map clicks
 const MapClickHandler = ({ onMapClick }) => {
   useMapEvents({
     click: (e) => onMapClick(e.latlng.lat, e.latlng.lng),
@@ -32,6 +33,7 @@ const MapClickHandler = ({ onMapClick }) => {
   return null;
 };
 
+// Component to center map on selection
 const CenterMap = ({ position, selectedVehicleId }) => {
   const map = useMap();
   const prevIdRef = useRef();
@@ -44,30 +46,56 @@ const CenterMap = ({ position, selectedVehicleId }) => {
   return null;
 };
 
-// Component to fit bounds to a selected region
-const FitRegionBounds = ({ geojson }) => {
+/**
+ * DEFENITIVE SOLUTION: RegionLayer handles manual clearing of polygons
+ * to prevent overlapping issues common in React-Leaflet
+ */
+const RegionLayer = ({ selectedRegion }) => {
   const map = useMap();
+  const layerGroupRef = useRef(L.layerGroup());
+
   useEffect(() => {
-    if (geojson) {
-      const layer = L.geoJSON(geojson);
-      map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
+    // Add the group to map if not already there
+    layerGroupRef.current.addTo(map);
+
+    // CRITICAL: Clear all previous layers from this group
+    layerGroupRef.current.clearLayers();
+
+    if (selectedRegion && selectedRegion.geojson) {
+      const geoJsonLayer = L.geoJSON(selectedRegion.geojson, {
+        style: {
+          color: COLORS.REGION,
+          weight: 2,
+          opacity: 0.8,
+          fillColor: COLORS.REGION,
+          fillOpacity: 0.2
+        }
+      });
+      
+      // Add the new polygon to our managed group
+      geoJsonLayer.addTo(layerGroupRef.current);
+      
+      // Auto-fit bounds
+      map.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
     }
-  }, [geojson, map]);
+
+    // Cleanup on unmount
+    return () => {
+      if (map.hasLayer(layerGroupRef.current)) {
+        layerGroupRef.current.clearLayers();
+      }
+    };
+  }, [selectedRegion, map]);
+
   return null;
 };
 
 const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget, selectedRegion }) => {
-  const position = [39.9208, 32.8541];
+  const position = [39.9208, 32.8541]; // Turkey center
   const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId);
 
   const handleMapClick = (lat, lng) => {
     if (selectedVehicleId) onSetTarget(selectedVehicleId, lat, lng);
-  };
-
-  const getVehicleColor = (vehicle) => {
-    if (vehicle.status === 'moving') return COLORS.GREEN;
-    if (vehicle.id === selectedVehicleId) return COLORS.BLUE;
-    return COLORS.GRAY;
   };
 
   return (
@@ -86,26 +114,13 @@ const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget, sel
       <MapClickHandler onMapClick={handleMapClick} />
       {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
       
-      {/* Region Boundary Rendering */}
-      {selectedRegion?.geojson && (
-        <>
-          <GeoJSON 
-            data={selectedRegion.geojson} 
-            style={{
-              color: COLORS.REGION,
-              weight: 3,
-              opacity: 0.7,
-              fillColor: COLORS.REGION,
-              fillOpacity: 0.1
-            }}
-          />
-          <FitRegionBounds geojson={selectedRegion.geojson} />
-        </>
-      )}
+      {/* Definitive Layer Management for Regions */}
+      <RegionLayer selectedRegion={selectedRegion} />
 
       {vehicles?.map((vehicle) => {
         const isSelected = vehicle.id === selectedVehicleId;
-        const color = getVehicleColor(vehicle);
+        const color = vehicle.status === 'moving' ? COLORS.GREEN : (isSelected ? COLORS.BLUE : COLORS.GRAY);
+        
         return (
           <React.Fragment key={vehicle.id}>
             {vehicle.target && (
@@ -116,16 +131,15 @@ const MapView = ({ currentTileUrl, vehicles, selectedVehicleId, onSetTarget, sel
                 weight={2}
               />
             )}
+
             <Marker position={[vehicle.position.lat, vehicle.position.lng]} icon={createCustomIcon(color)}>
               <Popup>
-                <div className="p-1">
-                  <h3 className="font-bold text-lg" style={{ color }}>{vehicle.name} {isSelected && "(Selected)"}</h3>
-                  <p className="text-sm text-gray-600">Plate: {vehicle.plate}</p>
+                <div className="p-1 text-sm">
+                  <h3 className="font-bold text-lg" style={{ color }}>{vehicle.name}</h3>
+                  <p className="text-gray-600">Plate: {vehicle.plate}</p>
                   <hr className="my-2" />
-                  <div className="flex flex-col gap-1 text-sm">
-                    <span><strong>Speed:</strong> {vehicle.speed} km/h</span>
-                    <span><strong>Status:</strong> <span className={`font-semibold`} style={{ color }}>{vehicle.status}</span></span>
-                  </div>
+                  <span><strong>Speed:</strong> {vehicle.speed} km/h</span><br/>
+                  <span><strong>Status:</strong> {vehicle.status}</span>
                 </div>
               </Popup>
             </Marker>
