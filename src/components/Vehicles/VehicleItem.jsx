@@ -14,6 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SpeedIcon from '@mui/icons-material/Speed';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import { useTranslation } from 'react-i18next';
 
 const VehicleItem = ({ 
@@ -27,6 +28,7 @@ const VehicleItem = ({
 }) => {
   const { t } = useTranslation();
   const [showActions, setShowActions] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   
   const getStatusColor = (status) => {
     switch (status) {
@@ -146,7 +148,7 @@ const VehicleItem = ({
                 <IconButton 
                   size="small" 
                   color="error" 
-                  onClick={(e) => handleAction(e, onDelete)}
+                  onClick={(e) => { e.stopPropagation(); setIsConfirmOpen(true); }}
                   sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'error.light' }}
                 >
                   <DeleteIcon fontSize="small" />
@@ -174,6 +176,14 @@ const VehicleItem = ({
           </Stack>
         </Box>
       </Collapse>
+
+      <ConfirmDialog 
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => onDelete(vehicle.id)}
+        title={t('delete')}
+        message={t('confirm_delete_vehicle')}
+      />
     </Box>
   );
 };

@@ -10,6 +10,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import SpeedIcon from '@mui/icons-material/Speed';
 import VehicleItem from './VehicleItem';
 import AddVehicleDialog from './AddVehicleDialog';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import useVehicles from '../../hooks/useVehicles';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +18,7 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmAllOpen, setIsConfirmAllOpen] = useState(false);
   const [bulkSpeed, setBulkSpeed] = useState(80);
   
   const {
@@ -38,12 +40,6 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
   const handleSelect = (id) => {
     selectVehicle(id);
     if (onSelectVehicle) onSelectVehicle(id);
-  };
-
-  const confirmDeleteAll = () => {
-    if (window.confirm(t('confirm_delete_all'))) {
-      deleteAllVehicles();
-    }
   };
 
   return (
@@ -72,7 +68,7 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
               <Button color="warning" onClick={stopAllVehicles}><StopIcon /></Button>
             </Tooltip>
             <Tooltip title={t('delete_all')}>
-              <Button color="error" onClick={confirmDeleteAll}><DeleteSweepIcon /></Button>
+              <Button color="error" onClick={() => setIsConfirmAllOpen(true)}><DeleteSweepIcon /></Button>
             </Tooltip>
           </ButtonGroup>
           
@@ -131,7 +127,16 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
           </List>
         )}
       </Box>
+
       <AddVehicleDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} onAdd={addVehicle} />
+      
+      <ConfirmDialog 
+        open={isConfirmAllOpen} 
+        onClose={() => setIsConfirmAllOpen(false)}
+        onConfirm={deleteAllVehicles}
+        title={t('delete_all')}
+        message={t('confirm_delete_all')}
+      />
     </Box>
   );
 };

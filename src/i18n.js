@@ -55,6 +55,9 @@ const resources = {
       "delete_all": "Delete All",
       "set_all_speed": "Set All Speed",
       "confirm_delete_all": "Are you sure you want to delete all vehicles?",
+      "confirm_delete_vehicle": "Are you sure you want to delete this vehicle?",
+      "confirm_action": "Confirm Action",
+      "confirm": "Confirm",
       "stopped": "stopped",
       "apply": "Apply"
     }
@@ -111,6 +114,9 @@ const resources = {
       "delete_all": "Tümünü Sil",
       "set_all_speed": "Hızı Tümüne Uygula",
       "confirm_delete_all": "Tüm araçları silmek istediğinize emin misiniz?",
+      "confirm_delete_vehicle": "Bu aracı silmek istediğinize emin misiniz?",
+      "confirm_action": "İşlemi Onayla",
+      "confirm": "Onayla",
       "stopped": "durduruldu",
       "apply": "Uygula"
     }
