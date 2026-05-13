@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, CircularProgress, Typography, useTheme, Button } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
+import CustomDrawControl from './CustomDrawControl';
 
 const VEHICLE_PATHS = {
   car: 'M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.27-3.82c.07-.21.27-.38.52-.38h10.42c.25 0 .45.17.52.38L19 11H5z',
@@ -33,30 +34,6 @@ const createCustomIcon = (color, isInside, type = 'car') => {
 
 const COLORS = { GRAY: '#9e9e9e', BLUE: '#1976d2', GREEN: '#4caf50', REGION: '#ff5722' };
 
-const DrawTools = () => {
-  const map = useMap();
-  const selectedRegion = useStore(state => state.selectedRegion);
-  const setDrawnPolygon = useStore(state => state.setDrawnPolygon);
-  const drawnItemsRef = useRef(new L.FeatureGroup());
-  useEffect(() => { if (!selectedRegion) drawnItemsRef.current.clearLayers(); }, [selectedRegion]);
-  useEffect(() => {
-    const drawnItems = drawnItemsRef.current;
-    map.addLayer(drawnItems);
-    const drawControl = new L.Control.Draw({
-      edit: false,
-      draw: {
-        polygon: { allowIntersection: false, showArea: false, shapeOptions: { color: COLORS.REGION } },
-        rectangle: false, circle: false, circlemarker: false, marker: false, polyline: false,
-      }
-    });
-    map.addControl(drawControl);
-    const onCreated = (e) => { drawnItems.clearLayers(); drawnItems.addLayer(e.layer); setDrawnPolygon(e.layer.toGeoJSON().geometry); };
-    map.on(L.Draw.Event.CREATED, onCreated);
-    return () => { map.removeControl(drawControl); map.off(L.Draw.Event.CREATED, onCreated); map.removeLayer(drawnItems); };
-  }, [map, setDrawnPolygon]);
-  return null;
-};
-
 const MapClickHandler = () => {
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
   const setVehicleTarget = useStore(state => state.setVehicleTarget);
@@ -77,20 +54,36 @@ const CenterMap = ({ position, selectedVehicleId }) => {
   return null;
 };
 
-const SearchedRegionLayer = () => {
+const RegionLayer = () => {
   const map = useMap();
   const selectedRegion = useStore(state => state.selectedRegion);
   const layerGroupRef = useRef(L.layerGroup());
+
   useEffect(() => {
     layerGroupRef.current.addTo(map);
     layerGroupRef.current.clearLayers();
-    if (selectedRegion?.source === 'search' && selectedRegion.geojson) {
-      const layer = L.geoJSON(selectedRegion.geojson, { style: { color: COLORS.REGION, weight: 2, fillColor: COLORS.REGION, fillOpacity: 0.2 } });
+
+    if (selectedRegion && selectedRegion.geojson) {
+      const layer = L.geoJSON(selectedRegion.geojson, { 
+        style: { 
+          color: COLORS.REGION, 
+          weight: 3, 
+          fillColor: COLORS.REGION, 
+          fillOpacity: 0.2,
+          dashArray: selectedRegion.source === 'draw' ? '5, 5' : '0'
+        } 
+      });
       layer.addTo(layerGroupRef.current);
-      map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
+      
+      // Only fit bounds for search results, not for manual drawing (which user already sees)
+      if (selectedRegion.source === 'search') {
+        map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
+      }
     }
+    
     return () => { layerGroupRef.current.clearLayers(); };
   }, [selectedRegion, map]);
+
   return null;
 };
 
@@ -105,6 +98,7 @@ const MapView = () => {
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
   const selectVehicle = useStore(state => state.selectVehicle);
   const selectedRegion = useStore(state => state.selectedRegion);
+  const setDrawnPolygon = useStore(state => state.setDrawnPolygon);
 
   const selectedVehicle = useMemo(() => vehicles.find(v => v.id === selectedVehicleId), [vehicles, selectedVehicleId]);
   const insideIds = useMemo(() => {
@@ -150,8 +144,8 @@ const MapView = () => {
         {!vehiclesLoading && (
           <>
             <MapClickHandler />
-            <SearchedRegionLayer />
-            <DrawTools />
+            <RegionLayer />
+            <CustomDrawControl onCreated={(e) => setDrawnPolygon(e.layer.toGeoJSON().geometry)} color={COLORS.REGION} />
             {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
             {vehicles.map((v) => {
               const isSelected = v.id === selectedVehicleId;
