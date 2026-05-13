@@ -87,6 +87,7 @@ const CustomDrawControl = ({ onCreated, color }) => {
   return (
     <Box
       ref={containerRef}
+      className="mui-map-control"
       sx={{ position: 'absolute', top: 80, left: 12, zIndex: 1000 }}
     >
       <Zoom in={true}>

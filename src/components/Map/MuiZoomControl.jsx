@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Paper, IconButton, Tooltip, Stack } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useMap } from 'react-leaflet';
@@ -6,28 +6,33 @@ import L from 'leaflet';
 
 const MuiZoomControl = () => {
   const map = useMap();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      L.DomEvent.disableClickPropagation(containerRef.current);
+      L.DomEvent.disableScrollPropagation(containerRef.current);
+    }
+  }, []);
 
   const handleZoomIn = (e) => {
-    L.DomEvent.stopPropagation(e);
     map.zoomIn();
   };
 
   const handleZoomOut = (e) => {
-    L.DomEvent.stopPropagation(e);
     map.zoomOut();
   };
 
   return (
     <Box 
+      ref={containerRef}
+      className="mui-map-control"
       sx={{ 
         position: 'absolute', 
         top: 12, 
         left: 12, 
-        zIndex: 1000,
-        pointerEvents: 'auto'
+        zIndex: 1000
       }}
-      onMouseDown={(e) => L.DomEvent.stopPropagation(e)}
-      onClick={(e) => L.DomEvent.stopPropagation(e)}
     >
       <Paper 
         elevation={0} 

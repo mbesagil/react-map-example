@@ -38,7 +38,15 @@ const COLORS = { GRAY: '#9e9e9e', BLUE: '#1976d2', GREEN: '#4caf50', REGION: '#f
 const MapClickHandler = () => {
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
   const setVehicleTarget = useStore(state => state.setVehicleTarget);
-  useMapEvents({ click: (e) => { if (selectedVehicleId) setVehicleTarget(selectedVehicleId, e.latlng.lat, e.latlng.lng); } });
+  useMapEvents({ 
+    click: (e) => { 
+      // Prevent click if it originated from a control
+      if (e.originalEvent.target.closest('.mui-map-control') || e.originalEvent.target.closest('.leaflet-control')) {
+        return;
+      }
+      if (selectedVehicleId) setVehicleTarget(selectedVehicleId, e.latlng.lat, e.latlng.lng); 
+    } 
+  });
   return null;
 };
 
