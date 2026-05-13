@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      "app_title": "Vehicle Management System",
+      "app_title": "Vehicle Management",
       "vehicles": "Vehicles",
       "add": "Add",
       "no_vehicles": "No vehicles yet.",

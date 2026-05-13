@@ -15,7 +15,7 @@ const Navbar = ({ onMenuClick }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { t, i18n } = useTranslation();
-  
+
   const isSatellite = useStore(state => state.getIsSatellite());
   const toggleTile = useStore(state => state.toggleTile);
   const darkMode = useStore(state => state.darkMode);
@@ -38,7 +38,7 @@ const Navbar = ({ onMenuClick }) => {
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1.25rem' } }}>
           {t('app_title')}
         </Typography>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
           {/* Theme Toggle */}
           <IconButton color="inherit" onClick={toggleDarkMode}>
@@ -58,7 +58,7 @@ const Navbar = ({ onMenuClick }) => {
             size="small"
             startIcon={isSatellite ? <MapIcon /> : <SatelliteIcon />}
             onClick={toggleTile}
-            sx={{ color: '#fff', borderColor: '#444', textTransform: 'none', ml: 1 }}
+            sx={{ color: '#fff', borderColor: '#444', textTransform: 'none' }}
           >
             {isMobile ? '' : (isSatellite ? t('standard') : t('satellite'))}
           </Button>
