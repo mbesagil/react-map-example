@@ -59,7 +59,10 @@ const resources = {
       "confirm_action": "Confirm Action",
       "confirm": "Confirm",
       "stopped": "stopped",
-      "apply": "Apply"
+      "apply": "Apply",
+      "welcome_title": "Welcome",
+      "welcome_subtitle": "Real-time Vehicle Tracking & Geofencing System",
+      "start_demo": "Click for Demo"
     }
   },
   tr: {
@@ -118,7 +121,10 @@ const resources = {
       "confirm_action": "İşlemi Onayla",
       "confirm": "Onayla",
       "stopped": "durduruldu",
-      "apply": "Uygula"
+      "apply": "Uygula",
+      "welcome_title": "Hoş Geldiniz",
+      "welcome_subtitle": "Gerçek Zamanlı Araç Takip ve Coğrafi Sınır Sistemi",
+      "start_demo": "Demo İçin Tıklayın"
     }
   }
 };
