@@ -5,7 +5,9 @@ import 'leaflet-draw';
 import { useStore } from '../../store/useStore';
 import { isPointInPolygon } from '../../utils/geo';
 import { useTranslation } from 'react-i18next';
-import { Box, CircularProgress, Typography, useTheme } from '@mui/material';
+import { Box, CircularProgress, Typography, useTheme, Button } from '@mui/material';
+import MapIcon from '@mui/icons-material/Map';
+import SatelliteIcon from '@mui/icons-material/Satellite';
 
 const createCustomIcon = (color, isInside) => {
   const halo = isInside ? `<circle cx="12" cy="9" r="10" stroke="${color}" stroke-width="2" stroke-dasharray="2,2" opacity="0.5"><animate attributeName="r" from="8" to="12" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" /></circle>` : '';
@@ -82,6 +84,8 @@ const MapView = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const tileUrl = useStore(state => state.getTileUrl());
+  const isSatellite = useStore(state => state.getIsSatellite());
+  const toggleTile = useStore(state => state.toggleTile);
   const vehicles = useStore(state => state.vehicles);
   const vehiclesLoading = useStore(state => state.vehiclesLoading);
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
@@ -96,6 +100,26 @@ const MapView = () => {
 
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+      {/* Map Type Switcher Floating Button */}
+      <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1000 }}>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={isSatellite ? <MapIcon /> : <SatelliteIcon />}
+          onClick={toggleTile}
+          sx={{ 
+            bgcolor: theme.palette.background.paper, 
+            color: theme.palette.text.primary,
+            '&:hover': { bgcolor: theme.palette.action.hover },
+            textTransform: 'none',
+            fontWeight: 'bold',
+            boxShadow: 3
+          }}
+        >
+          {isSatellite ? t('standard') : t('satellite')}
+        </Button>
+      </Box>
+
       {vehiclesLoading && (
         <Box sx={{ 
           position: 'absolute', inset: 0, zIndex: 10000, 

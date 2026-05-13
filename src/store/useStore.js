@@ -22,12 +22,10 @@ const createMapSlice = (set, get) => ({
 // --- VEHICLE SLICE ---
 const createVehicleSlice = (set, get) => ({
   vehicles: [],
-  vehiclesLoading: true, // New loading state
+  vehiclesLoading: true,
   selectedVehicleId: null,
-
   setVehiclesLoading: (loading) => set({ vehiclesLoading: loading }),
   setVehicles: (vehicles) => set({ vehicles, vehiclesLoading: false }),
-  
   selectVehicle: (id) => set((state) => ({ selectedVehicleId: state.selectedVehicleId === id ? null : id })),
   addVehicle: (vehicleData) => set((state) => ({
     vehicles: [...state.vehicles, {
@@ -80,7 +78,11 @@ export const useStore = create(
     {
       name: 'vehicle-tracker-settings',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ darkMode: state.darkMode }),
+      // PERSIST both darkMode AND tileType
+      partialize: (state) => ({ 
+        darkMode: state.darkMode,
+        tileType: state.tileType 
+      }), 
     }
   )
 );
