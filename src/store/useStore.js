@@ -20,7 +20,12 @@ export const useStore = create((set, get) => ({
     { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }
   ],
   selectedVehicleId: null,
-  selectVehicle: (id) => set({ selectedVehicleId: id }),
+  
+  // Toggle selection logic: if ID is same, set to null
+  selectVehicle: (id) => set((state) => ({ 
+    selectedVehicleId: state.selectedVehicleId === id ? null : id 
+  })),
+
   addVehicle: (vehicleData) => set((state) => ({
     vehicles: [...state.vehicles, {
       id: Date.now(),
@@ -63,7 +68,7 @@ export const useStore = create((set, get) => ({
     }));
   },
 
-  // Helper actions to get derived data without creating infinite loops
+  // Helper actions
   getTileUrl: () => TILE_LAYERS[get().tileType],
   getIsSatellite: () => get().tileType === 'satellite'
 }));

@@ -21,6 +21,19 @@ const MapClickHandler = () => {
   return null;
 };
 
+const CenterMap = ({ position, selectedVehicleId }) => {
+  const map = useMap();
+  const prevIdRef = useRef();
+  useEffect(() => {
+    if (position && selectedVehicleId && selectedVehicleId !== prevIdRef.current) {
+      map.flyTo([position.lat, position.lng], map.getZoom(), { animate: true, duration: 1.5 });
+      prevIdRef.current = selectedVehicleId;
+    }
+    if (!selectedVehicleId) prevIdRef.current = null;
+  }, [position, selectedVehicleId, map]);
+  return null;
+};
+
 const RegionLayer = () => {
   const map = useMap();
   const selectedRegion = useStore(state => state.selectedRegion);
@@ -42,14 +55,13 @@ const MapView = () => {
   const tileUrl = useStore(state => state.getTileUrl());
   const vehicles = useStore(state => state.vehicles);
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
+  const selectVehicle = useStore(state => state.selectVehicle);
   const selectedRegion = useStore(state => state.selectedRegion);
 
-  // Local geofencing analysis for visualization
+  const selectedVehicle = useMemo(() => vehicles.find(v => v.id === selectedVehicleId), [vehicles, selectedVehicleId]);
   const insideIds = useMemo(() => {
     if (!selectedRegion?.geojson) return [];
-    return vehicles
-      .filter(v => isPointInPolygon(v.position, selectedRegion.geojson))
-      .map(v => v.id);
+    return vehicles.filter(v => isPointInPolygon(v.position, selectedRegion.geojson)).map(v => v.id);
   }, [vehicles, selectedRegion]);
 
   return (
@@ -57,20 +69,22 @@ const MapView = () => {
       <TileLayer url={tileUrl} />
       <MapClickHandler />
       <RegionLayer />
+      {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
       {vehicles.map((v) => {
         const isSelected = v.id === selectedVehicleId;
         const color = v.status === 'moving' ? COLORS.GREEN : (isSelected ? COLORS.BLUE : COLORS.GRAY);
         const isInside = insideIds.includes(v.id);
-
         return (
           <React.Fragment key={v.id}>
             {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
-            <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)}>
+            <Marker 
+              position={[v.position.lat, v.position.lng]} 
+              icon={createCustomIcon(color, isInside)}
+              eventHandlers={{ click: () => selectVehicle(v.id) }}
+            >
               <Popup>
                 <div className="p-1">
-                  <strong>{v.name}</strong><br/>
-                  Plate: {v.plate}<br/>
-                  Status: {v.status}
+                  <strong>{v.name}</strong><br/>Plate: {v.plate}<br/>Status: {v.status}
                   {isInside && <div style={{ color: '#2e7d32', fontWeight: 'bold' }}>📍 Inside Polygon</div>}
                 </div>
               </Popup>
