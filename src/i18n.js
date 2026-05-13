@@ -36,7 +36,13 @@ const resources = {
       "motorcycle": "Motorcycle",
       "service": "Service",
       "truck": "Truck",
-      "vehicle_type": "Vehicle Type"
+      "vehicle_type": "Vehicle Type",
+      "location": "Location",
+      "vehicle_name_placeholder": "e.g. Black Sedan",
+      "plate_placeholder": "e.g. 42 ABC 01",
+      "speed_placeholder": "e.g. 80",
+      "latitude_placeholder": "e.g. 37.8714",
+      "longitude_placeholder": "e.g. 32.4846"
     }
   },
   tr: {
@@ -72,7 +78,13 @@ const resources = {
       "motorcycle": "Motor",
       "service": "Servis",
       "truck": "Kamyon",
-      "vehicle_type": "Araç Tipi"
+      "vehicle_type": "Araç Tipi",
+      "location": "Konum",
+      "vehicle_name_placeholder": "Örn: Siyah Binek",
+      "plate_placeholder": "Örn: 42 ABC 01",
+      "speed_placeholder": "Örn: 80",
+      "latitude_placeholder": "Örn: 37.8714",
+      "longitude_placeholder": "Örn: 32.4846"
     }
   }
 };
