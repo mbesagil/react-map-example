@@ -2,8 +2,11 @@ import React from 'react';
 import { ListItem, ListItemText, ListItemAvatar, Avatar, Typography, ListItemButton, Box } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { useTranslation } from 'react-i18next';
 
 const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
+  const { t } = useTranslation();
+  
   const getStatusColor = (status) => {
     switch (status) {
       case 'moving': return '#4caf50';
@@ -42,11 +45,11 @@ const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
               </Typography>
               <FiberManualRecordIcon sx={{ fontSize: 10, color: getStatusColor(vehicle.status) }} />
               <Typography component="span" variant="caption" sx={{ textTransform: 'capitalize' }}>
-                {vehicle.status}
+                {t(vehicle.status)}
               </Typography>
             </Box>
           }
-          slotProps={{ secondary: { component: 'span' } }} // MUI v6 standard or v5 slot compatible
+          slotProps={{ secondary: { component: 'span' } }}
         />
         <Typography component="span" variant="caption" sx={{ color: '#666', fontWeight: 'bold', ml: 'auto' }}>
           {vehicle.speed} km/h

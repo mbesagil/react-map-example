@@ -4,8 +4,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import { useStore } from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
 const RegionSearchBar = () => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { searchResults, selectedRegion, regionLoading, setSearchResults, setRegionLoading, selectRegion, clearRegion } = useStore();
 
@@ -24,7 +26,6 @@ const RegionSearchBar = () => {
     }
   };
 
-  // Only clears the text input
   const handleClearInput = () => {
     setQuery('');
   };
@@ -33,7 +34,7 @@ const RegionSearchBar = () => {
     <Box sx={{ position: 'relative', width: '100%', mb: 1 }}>
       <form onSubmit={handleSearch}>
         <TextField
-          fullWidth size="small" placeholder="Search region..."
+          fullWidth size="small" placeholder={t('search_region')}
           value={query} onChange={(e) => setQuery(e.target.value)}
           slotProps={{
             input: {
@@ -46,7 +47,6 @@ const RegionSearchBar = () => {
         />
       </form>
 
-      {/* Manual Clear Area Button - Only shows when a region is active */}
       {selectedRegion && (
         <Button
           fullWidth
@@ -57,7 +57,7 @@ const RegionSearchBar = () => {
           onClick={clearRegion}
           sx={{ mt: 1, textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem' }}
         >
-          Alanı Temizle
+          {t('clear_area')}
         </Button>
       )}
 
@@ -84,7 +84,7 @@ const RegionSearchBar = () => {
       )}
       {selectedRegion && (
         <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5, fontWeight: 'bold' }}>
-          Aktif Bölge: {selectedRegion.display_name.split(',')[0]}
+          {t('active_region')}: {selectedRegion.display_name.split(',')[0]}
         </Typography>
       )}
     </Box>

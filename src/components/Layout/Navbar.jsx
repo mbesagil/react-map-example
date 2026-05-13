@@ -3,16 +3,24 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/mater
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import MenuIcon from '@mui/icons-material/Menu';
+import TranslateIcon from '@mui/icons-material/Translate';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useStore } from '../../store/useStore';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = ({ onMenuClick }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { t, i18n } = useTranslation();
   
   const isSatellite = useStore(state => state.getIsSatellite());
   const toggleTile = useStore(state => state.toggleTile);
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'tr' ? 'en' : 'tr';
+    i18n.changeLanguage(newLang);
+  };
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1a1a1a', borderBottom: '1px solid #333' }}>
@@ -24,16 +32,25 @@ const Navbar = ({ onMenuClick }) => {
         )}
         <MapIcon sx={{ mr: { xs: 1, sm: 2 }, color: '#1976d2' }} />
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1.25rem' } }}>
-          {isMobile ? 'Vehicle Tracker' : 'React Vehicle Management System'}
+          {t('app_title')}
         </Typography>
-        <Box>
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton color="inherit" onClick={toggleLanguage} title="Switch Language">
+            <TranslateIcon fontSize="small" />
+            <Typography variant="caption" sx={{ ml: 0.5, fontWeight: 'bold' }}>
+              {i18n.language?.toUpperCase().substring(0, 2)}
+            </Typography>
+          </IconButton>
+
           <Button
             variant="outlined"
+            size="small"
             startIcon={isSatellite ? <MapIcon /> : <SatelliteIcon />}
             onClick={toggleTile}
-            sx={{ color: '#fff', borderColor: '#444', textTransform: 'none' }}
+            sx={{ color: '#fff', borderColor: '#444', textTransform: 'none', ml: 1 }}
           >
-            {isMobile ? '' : (isSatellite ? 'Standard' : 'Satellite')}
+            {isMobile ? '' : (isSatellite ? t('standard') : t('satellite'))}
           </Button>
         </Box>
       </Toolbar>

@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet-draw';
 import { useStore } from '../../store/useStore';
 import { isPointInPolygon } from '../../utils/geo';
+import { useTranslation } from 'react-i18next';
 
 const createCustomIcon = (color, isInside) => {
   const halo = isInside ? `<circle cx="12" cy="9" r="10" stroke="${color}" stroke-width="2" stroke-dasharray="2,2" opacity="0.5"><animate attributeName="r" from="8" to="12" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" /></circle>` : '';
@@ -20,47 +21,22 @@ const DrawTools = () => {
   const selectedRegion = useStore(state => state.selectedRegion);
   const setDrawnPolygon = useStore(state => state.setDrawnPolygon);
   const drawnItemsRef = useRef(new L.FeatureGroup());
-
-  // Listen to store changes to clear map layers
-  useEffect(() => {
-    if (!selectedRegion) {
-      drawnItemsRef.current.clearLayers();
-    }
-  }, [selectedRegion]);
-
+  useEffect(() => { if (!selectedRegion) drawnItemsRef.current.clearLayers(); }, [selectedRegion]);
   useEffect(() => {
     const drawnItems = drawnItemsRef.current;
     map.addLayer(drawnItems);
-
     const drawControl = new L.Control.Draw({
-      edit: false, // Disable edit/delete toolbar as requested
+      edit: false,
       draw: {
-        polygon: {
-          allowIntersection: false,
-          showArea: false,
-          shapeOptions: { color: COLORS.REGION }
-        },
+        polygon: { allowIntersection: false, showArea: false, shapeOptions: { color: COLORS.REGION } },
         rectangle: false, circle: false, circlemarker: false, marker: false, polyline: false,
       }
     });
-
     map.addControl(drawControl);
-
-    const onCreated = (e) => {
-      drawnItems.clearLayers(); // Strict rule: only one polygon
-      drawnItems.addLayer(e.layer);
-      setDrawnPolygon(e.layer.toGeoJSON().geometry);
-    };
-
+    const onCreated = (e) => { drawnItems.clearLayers(); drawnItems.addLayer(e.layer); setDrawnPolygon(e.layer.toGeoJSON().geometry); };
     map.on(L.Draw.Event.CREATED, onCreated);
-
-    return () => {
-      map.removeControl(drawControl);
-      map.off(L.Draw.Event.CREATED, onCreated);
-      map.removeLayer(drawnItems);
-    };
+    return () => { map.removeControl(drawControl); map.off(L.Draw.Event.CREATED, onCreated); map.removeLayer(drawnItems); };
   }, [map, setDrawnPolygon]);
-
   return null;
 };
 
@@ -102,6 +78,7 @@ const SearchedRegionLayer = () => {
 };
 
 const MapView = () => {
+  const { t } = useTranslation();
   const tileUrl = useStore(state => state.getTileUrl());
   const vehicles = useStore(state => state.vehicles);
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
@@ -129,7 +106,13 @@ const MapView = () => {
           <React.Fragment key={v.id}>
             {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
             <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
-              <Popup><div className="p-1 text-sm"><h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3><p>Plate: {v.plate}</p>{isInside && <p className="text-green-600 font-bold">Inside Polygon</p>}</div></Popup>
+              <Popup>
+                <div className="p-1 text-sm">
+                  <h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3>
+                  <p>{t('plate')}: {v.plate}</p>
+                  {isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}
+                </div>
+              </Popup>
             </Marker>
           </React.Fragment>
         );
