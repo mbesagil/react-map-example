@@ -9,6 +9,7 @@ import { Box, CircularProgress, Typography, useTheme, Button } from '@mui/materi
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import CustomDrawControl from './CustomDrawControl';
+import MuiZoomControl from './MuiZoomControl';
 
 const VEHICLE_PATHS = {
   car: 'M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.27-3.82c.07-.21.27-.38.52-.38h10.42c.25 0 .45.17.52.38L19 11H5z',
@@ -75,7 +76,6 @@ const RegionLayer = () => {
       });
       layer.addTo(layerGroupRef.current);
       
-      // Only fit bounds for search results, not for manual drawing (which user already sees)
       if (selectedRegion.source === 'search') {
         map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
       }
@@ -139,10 +139,17 @@ const MapView = () => {
           <Typography sx={{ mt: 2, fontWeight: 'bold', color: theme.palette.primary.main }}>{t('loading_data')}</Typography>
         </Box>
       )}
-      <MapContainer center={[39.9208, 32.8541]} zoom={6} className="w-full h-full" style={{ height: '100%', width: '100%' }}>
+      <MapContainer 
+        center={[39.9208, 32.8541]} 
+        zoom={6} 
+        className="w-full h-full" 
+        style={{ height: '100%', width: '100%' }}
+        zoomControl={false}
+      >
         <TileLayer url={tileUrl} />
         {!vehiclesLoading && (
           <>
+            <MuiZoomControl />
             <MapClickHandler />
             <RegionLayer />
             <CustomDrawControl onCreated={(e) => setDrawnPolygon(e.layer.toGeoJSON().geometry)} color={COLORS.REGION} />
