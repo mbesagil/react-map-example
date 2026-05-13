@@ -1,16 +1,65 @@
-# React + Vite
+# Araç Takip ve Coğrafi Sınır (Geofencing) Sistemi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu proje, gerçek zamanlı araç takibi, gelişmiş coğrafi sınır (geofencing) analitiği ve çoklu araç kontrol mekanizmalarını içeren bir web uygulamasıdır.
 
-Currently, two official plugins are available:
+## 🚀 Projede Neler Yapıldı?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Proje süresince temel bir harita uygulamasından tam kapsamlı bir filo yönetim simülasyonuna geçiş yapıldı:
 
-## React Compiler
+- **Canlı Araç Takibi:** Araçların harita üzerinde gerçek zamanlı hareket simülasyonu.
+- **Çoklu Araç Kontrolü:** Araçları tekli veya toplu olarak başlatma, durdurma, silme ve hızlarını anlık olarak değiştirme yeteneği.
+- **Gelişmiş Coğrafi Sınır (Geofencing):** 
+    - Harita üzerinde manuel poligon çizimi.
+    - Bölge arama motoru ile hazır alanların (Örn: Konya, Ankara) yüklenmesi.
+    - Araçların poligonun içinde/dışında olma durumunun anlık analizi.
+- **Özel Harita Kontrolleri:** Leaflet'in standart kontrolleri yerine MUI tabanlı modern ve şık Zoom ile Çizim araçları geliştirildi.
+- **Kullanıcı Arayüzü:** 
+    - Landing Page (Karşılama Sayfası) ve Dashboard yapısı.
+    - Koyu ve Aydınlık mod desteği.
+    - Tamamen duyarlı (responsive) tasarım.
+- **Uluslararasılaştırma (i18n):** Türkçe ve İngilizce dillerine tam destek.
+- **Hata Yönetimi:** DOM hiyerarşisi hataları ve performans darboğazları için optimizasyonlar.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Kullanılan Teknolojiler
 
-## Expanding the ESLint configuration
+- **Frontend:** React 19, Vite
+- **Harita:** Leaflet, React-Leaflet, Leaflet-Draw
+- **UI/UX:** Material UI (MUI), TailwindCSS
+- **State Yönetimi:** Zustand (Modular Slices & Persistence)
+- **Dil Desteği:** i18next
+- **Navigasyon:** React Router Dom
+- **Dağıtım/Container:** Docker, Nginx
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🏁 Nasıl Başlatılır?
+
+### 1. Yerel Geliştirme Ortamı
+
+Projeyi yerel makinenizde çalıştırmak için:
+
+```bash
+# Bağımlılıkları yükleyin
+npm install
+
+# Geliştirme sunucusunu başlatın
+npm run dev
+```
+Uygulama varsayılan olarak `http://localhost:5173` adresinde çalışacaktır.
+
+### 2. Docker ile Çalıştırma
+
+Projeyi Docker üzerinde production provası olarak çalıştırmak için:
+
+```bash
+# İmajı oluşturun ve konteyneri başlatın
+docker-compose up --build
+```
+Uygulamaya `http://localhost:8080` adresinden erişebilirsiniz.
+
+## 📁 Proje Yapısı
+
+- `src/components`: Harita, Araç ve Bölge bileşenleri.
+- `src/store`: Zustand dilimleri (slices) ile merkezi state yönetimi.
+- `src/hooks`: Araç mantığı ve geofencing için özel hooklar.
+- `src/pages`: Landing ve Dashboard sayfaları.
+- `src/utils`: Coğrafi hesaplamalar ve hareket simülasyonu algoritmaları.
+
