@@ -37,7 +37,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
@@ -47,7 +47,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
@@ -57,7 +57,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
@@ -73,7 +73,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 <MenuItem value="truck">{t('truck')}</MenuItem>
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
@@ -84,7 +84,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
@@ -96,7 +96,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 required
                 fullWidth
