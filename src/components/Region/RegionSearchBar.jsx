@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, TextField, List, ListItem, ListItemText, Paper, CircularProgress, InputAdornment, IconButton, Typography } from '@mui/material';
+import { Box, TextField, List, ListItem, ListItemText, Paper, CircularProgress, InputAdornment, IconButton, Typography, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import { useStore } from '../../store/useStore';
 
 const RegionSearchBar = () => {
@@ -23,9 +24,9 @@ const RegionSearchBar = () => {
     }
   };
 
-  const handleClear = () => {
+  // Only clears the text input
+  const handleClearInput = () => {
     setQuery('');
-    clearRegion();
   };
 
   return (
@@ -38,30 +39,37 @@ const RegionSearchBar = () => {
             input: {
               startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
               endAdornment: <InputAdornment position="end">
-                {regionLoading ? <CircularProgress size={20} /> : (query && <IconButton size="small" onClick={handleClear}><ClearIcon fontSize="small" /></IconButton>)}
+                {regionLoading ? <CircularProgress size={20} /> : (query && <IconButton size="small" onClick={handleClearInput}><ClearIcon fontSize="small" /></IconButton>)}
               </InputAdornment>
             }
           }}
         />
       </form>
+
+      {/* Manual Clear Area Button - Only shows when a region is active */}
+      {selectedRegion && (
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          size="small"
+          startIcon={<DeleteSweepIcon />}
+          onClick={clearRegion}
+          sx={{ mt: 1, textTransform: 'none', fontWeight: 'bold', fontSize: '0.75rem' }}
+        >
+          Alanı Temizle
+        </Button>
+      )}
+
       {searchResults.length > 0 && (
         <Paper elevation={3} sx={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1100, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
           <List dense>
             {searchResults.map((r) => (
-              <ListItem 
-                key={r.place_id} 
-                disablePadding
-              >
+              <ListItem key={r.place_id} disablePadding>
                 <Box 
                   component="div" 
                   onClick={() => { selectRegion(r); setQuery(r.display_name); }}
-                  sx={{ 
-                    width: '100%', 
-                    px: 2, 
-                    py: 1, 
-                    cursor: 'pointer', 
-                    '&:hover': { bgcolor: 'action.hover' } 
-                  }}
+                  sx={{ width: '100%', px: 2, py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
                 >
                   <ListItemText 
                     primary={r.display_name} 
@@ -74,7 +82,11 @@ const RegionSearchBar = () => {
           </List>
         </Paper>
       )}
-      {selectedRegion && <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5 }}>Selected: {selectedRegion.display_name.split(',')[0]}</Typography>}
+      {selectedRegion && (
+        <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5, fontWeight: 'bold' }}>
+          Aktif Bölge: {selectedRegion.display_name.split(',')[0]}
+        </Typography>
+      )}
     </Box>
   );
 };

@@ -17,20 +17,27 @@ const COLORS = { GRAY: '#9e9e9e', BLUE: '#1976d2', GREEN: '#4caf50', REGION: '#f
 
 const DrawTools = () => {
   const map = useMap();
+  const selectedRegion = useStore(state => state.selectedRegion);
   const setDrawnPolygon = useStore(state => state.setDrawnPolygon);
-  const clearRegion = useStore(state => state.clearRegion);
   const drawnItemsRef = useRef(new L.FeatureGroup());
+
+  // Listen to store changes to clear map layers
+  useEffect(() => {
+    if (!selectedRegion) {
+      drawnItemsRef.current.clearLayers();
+    }
+  }, [selectedRegion]);
 
   useEffect(() => {
     const drawnItems = drawnItemsRef.current;
     map.addLayer(drawnItems);
 
     const drawControl = new L.Control.Draw({
-      edit: { featureGroup: drawnItems, remove: true },
+      edit: false, // Disable edit/delete toolbar as requested
       draw: {
         polygon: {
           allowIntersection: false,
-          showArea: false, // Set to false to avoid "type is not defined" error in leaflet-draw
+          showArea: false,
           shapeOptions: { color: COLORS.REGION }
         },
         rectangle: false, circle: false, circlemarker: false, marker: false, polyline: false,
@@ -40,29 +47,19 @@ const DrawTools = () => {
     map.addControl(drawControl);
 
     const onCreated = (e) => {
-      drawnItems.clearLayers();
+      drawnItems.clearLayers(); // Strict rule: only one polygon
       drawnItems.addLayer(e.layer);
       setDrawnPolygon(e.layer.toGeoJSON().geometry);
     };
 
-    const onEdited = (e) => {
-      e.layers.eachLayer(layer => setDrawnPolygon(layer.toGeoJSON().geometry));
-    };
-
-    const onDeleted = () => clearRegion();
-
     map.on(L.Draw.Event.CREATED, onCreated);
-    map.on(L.Draw.Event.EDITED, onEdited);
-    map.on(L.Draw.Event.DELETED, onDeleted);
 
     return () => {
       map.removeControl(drawControl);
       map.off(L.Draw.Event.CREATED, onCreated);
-      map.off(L.Draw.Event.EDITED, onEdited);
-      map.off(L.Draw.Event.DELETED, onDeleted);
       map.removeLayer(drawnItems);
     };
-  }, [map, setDrawnPolygon, clearRegion]);
+  }, [map, setDrawnPolygon]);
 
   return null;
 };
