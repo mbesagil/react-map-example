@@ -5,6 +5,7 @@ import 'leaflet-draw';
 import { useStore } from '../../store/useStore';
 import { isPointInPolygon } from '../../utils/geo';
 import { useTranslation } from 'react-i18next';
+import { Box, CircularProgress, Typography, useTheme } from '@mui/material';
 
 const createCustomIcon = (color, isInside) => {
   const halo = isInside ? `<circle cx="12" cy="9" r="10" stroke="${color}" stroke-width="2" stroke-dasharray="2,2" opacity="0.5"><animate attributeName="r" from="8" to="12" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" /></circle>` : '';
@@ -79,8 +80,10 @@ const SearchedRegionLayer = () => {
 
 const MapView = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const tileUrl = useStore(state => state.getTileUrl());
   const vehicles = useStore(state => state.vehicles);
+  const vehiclesLoading = useStore(state => state.vehiclesLoading);
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
   const selectVehicle = useStore(state => state.selectVehicle);
   const selectedRegion = useStore(state => state.selectedRegion);
@@ -92,32 +95,43 @@ const MapView = () => {
   }, [vehicles, selectedRegion]);
 
   return (
-    <MapContainer center={[39.9208, 32.8541]} zoom={6} className="w-full h-full" style={{ height: '100%', width: '100%' }}>
-      <TileLayer url={tileUrl} />
-      <MapClickHandler />
-      <SearchedRegionLayer />
-      <DrawTools />
-      {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
-      {vehicles.map((v) => {
-        const isSelected = v.id === selectedVehicleId;
-        const color = v.status === 'moving' ? COLORS.GREEN : (isSelected ? COLORS.BLUE : COLORS.GRAY);
-        const isInside = insideIds.includes(v.id);
-        return (
-          <React.Fragment key={v.id}>
-            {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
-            <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
-              <Popup>
-                <div className="p-1 text-sm">
-                  <h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3>
-                  <p>{t('plate')}: {v.plate}</p>
-                  {isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}
-                </div>
-              </Popup>
-            </Marker>
-          </React.Fragment>
-        );
-      })}
-    </MapContainer>
+    <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+      {vehiclesLoading && (
+        <Box sx={{ 
+          position: 'absolute', inset: 0, zIndex: 10000, 
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)', 
+          backdropFilter: 'blur(4px)'
+        }}>
+          <CircularProgress size={60} thickness={4} />
+          <Typography sx={{ mt: 2, fontWeight: 'bold', color: theme.palette.primary.main }}>{t('loading_data')}</Typography>
+        </Box>
+      )}
+      <MapContainer center={[39.9208, 32.8541]} zoom={6} className="w-full h-full" style={{ height: '100%', width: '100%' }}>
+        <TileLayer url={tileUrl} />
+        {!vehiclesLoading && (
+          <>
+            <MapClickHandler />
+            <SearchedRegionLayer />
+            <DrawTools />
+            {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
+            {vehicles.map((v) => {
+              const isSelected = v.id === selectedVehicleId;
+              const color = v.status === 'moving' ? COLORS.GREEN : (isSelected ? COLORS.BLUE : COLORS.GRAY);
+              const isInside = insideIds.includes(v.id);
+              return (
+                <React.Fragment key={v.id}>
+                  {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
+                  <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
+                    <Popup><div className="p-1 text-sm"><h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3><p>{t('plate')}: {v.plate}</p>{isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}</div></Popup>
+                  </Marker>
+                </React.Fragment>
+              );
+            })}
+          </>
+        )}
+      </MapContainer>
+    </Box>
   );
 };
 

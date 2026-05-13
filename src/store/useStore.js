@@ -21,8 +21,13 @@ const createMapSlice = (set, get) => ({
 
 // --- VEHICLE SLICE ---
 const createVehicleSlice = (set, get) => ({
-  vehicles: [{ id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }],
+  vehicles: [],
+  vehiclesLoading: true, // New loading state
   selectedVehicleId: null,
+
+  setVehiclesLoading: (loading) => set({ vehiclesLoading: loading }),
+  setVehicles: (vehicles) => set({ vehicles, vehiclesLoading: false }),
+  
   selectVehicle: (id) => set((state) => ({ selectedVehicleId: state.selectedVehicleId === id ? null : id })),
   addVehicle: (vehicleData) => set((state) => ({
     vehicles: [...state.vehicles, {
@@ -37,8 +42,8 @@ const createVehicleSlice = (set, get) => ({
     vehicles: state.vehicles.map((v) => v.id === id ? { ...v, target: { lat, lng }, status: 'moving' } : v)
   })),
   tick: () => {
-    const { vehicles } = get();
-    if (!vehicles.some(v => v.status === 'moving')) return;
+    const { vehicles, vehiclesLoading } = get();
+    if (vehiclesLoading || !vehicles.some(v => v.status === 'moving')) return;
     set((state) => ({
       vehicles: state.vehicles.map((v) => {
         if (v.status !== 'moving' || !v.target) return v;
@@ -73,9 +78,9 @@ export const useStore = create(
       ...createRegionSlice(set, get),
     }),
     {
-      name: 'vehicle-tracker-settings', // storage key
+      name: 'vehicle-tracker-settings',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ darkMode: state.darkMode }), // ONLY persist darkMode
+      partialize: (state) => ({ darkMode: state.darkMode }),
     }
   )
 );

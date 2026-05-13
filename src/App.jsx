@@ -10,9 +10,14 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+const INITIAL_VEHICLES = [
+  { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: { lat: 37.8714, lng: 32.4846 }, target: null }
+];
+
 function App() {
   const tick = useStore((state) => state.tick);
   const darkMode = useStore((state) => state.darkMode);
+  const setVehicles = useStore((state) => state.setVehicles);
   const [mobileOpen, setMobileOpen] = useState(false);
   
   const theme = useMemo(() => createTheme({
@@ -24,12 +29,18 @@ function App() {
         paper: darkMode ? '#1e1e1e' : '#ffffff',
       },
     },
-    typography: {
-      fontFamily: 'Inter, Roboto, sans-serif',
-    },
+    typography: { fontFamily: 'Inter, Roboto, sans-serif' },
   }), [darkMode]);
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Simulation API Call
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVehicles(INITIAL_VEHICLES);
+    }, 2000); // 2 second fake loading
+    return () => clearTimeout(timer);
+  }, [setVehicles]);
 
   // Simulation Loop
   useEffect(() => {
@@ -49,7 +60,6 @@ function App() {
       <CssBaseline />
       <div className={`flex flex-col h-screen w-full overflow-hidden ${darkMode ? 'dark' : ''}`}>
         <Navbar onMenuClick={() => setMobileOpen(!mobileOpen)} />
-        
         <div className="flex flex-1 overflow-hidden relative">
           {!isMobile && <aside className="z-10 shadow-xl">{SidebarContent}</aside>}
           <Drawer
@@ -61,7 +71,6 @@ function App() {
           >
             {SidebarContent}
           </Drawer>
-
           <main className="flex-grow relative">
             <MapView />
           </main>
