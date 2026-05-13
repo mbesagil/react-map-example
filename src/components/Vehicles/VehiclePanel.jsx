@@ -8,21 +8,28 @@ import AddIcon from '@mui/icons-material/Add';
 import VehicleItem from './VehicleItem';
 import AddVehicleDialog from './AddVehicleDialog';
 
-const VehiclePanel = ({ vehicles, onAddVehicle }) => {
+const VehiclePanel = ({ vehicles, onAddVehicle, selectedVehicleId, onSelectVehicle }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <Box sx={{ width: 320, height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'white', borderRight: '1px solid #ddd' }}>
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f8f9fa' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Vehicles</Typography>
-        <Button 
-          variant="contained" 
-          size="small" 
-          startIcon={<AddIcon />}
-          onClick={() => setIsDialogOpen(true)}
-        >
-          Add
-        </Button>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: '#f8f9fa' }}>
+        <div className="flex justify-between items-center">
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Vehicles</Typography>
+          <Button 
+            variant="contained" 
+            size="small" 
+            startIcon={<AddIcon />}
+            onClick={() => setIsDialogOpen(true)}
+          >
+            Add
+          </Button>
+        </div>
+        {selectedVehicleId && (
+          <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>
+            Click on map to set target for selected vehicle
+          </Typography>
+        )}
       </Box>
       <Divider />
       
@@ -34,7 +41,12 @@ const VehiclePanel = ({ vehicles, onAddVehicle }) => {
         ) : (
           <List sx={{ p: 0 }}>
             {vehicles.map((vehicle) => (
-              <VehicleItem key={vehicle.id} vehicle={vehicle} />
+              <VehicleItem 
+                key={vehicle.id} 
+                vehicle={vehicle} 
+                isSelected={vehicle.id === selectedVehicleId}
+                onSelect={onSelectVehicle}
+              />
             ))}
           </List>
         )}

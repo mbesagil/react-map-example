@@ -13,31 +13,35 @@ const statusColors = {
   arrived: 'primary'
 };
 
-const VehicleItem = ({ vehicle }) => {
+const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
   return (
     <ListItem 
+      button
+      onClick={() => onSelect(vehicle.id)}
       alignItems="flex-start" 
       sx={{ 
         borderBottom: '1px solid #eee',
-        '&:hover': { backgroundColor: '#f9f9f9' }
+        backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
+        borderLeft: isSelected ? '4px solid #1976d2' : '4px solid transparent',
+        '&:hover': { backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.12)' : '#f9f9f9' }
       }}
     >
       <ListItemAvatar>
-        <Avatar sx={{ bgcolor: vehicle.status === 'moving' ? '#4caf50' : '#1976d2' }}>
+        <Avatar sx={{ bgcolor: vehicle.status === 'moving' ? '#4caf50' : (isSelected ? '#1976d2' : '#9e9e9e') }}>
           <DirectionsCarIcon />
         </Avatar>
       </ListItemAvatar>
       <ListItemText
         primary={
           <div className="flex justify-between items-center">
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: isSelected ? '#1976d2' : 'inherit' }}>
               {vehicle.name}
             </Typography>
             <Chip 
               label={vehicle.status} 
               size="small" 
               color={statusColors[vehicle.status]} 
-              variant="outlined"
+              variant={isSelected ? "filled" : "outlined"}
             />
           </div>
         }

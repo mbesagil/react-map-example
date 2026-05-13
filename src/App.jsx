@@ -7,7 +7,13 @@ import useVehicles from './hooks/useVehicles';
 
 function App() {
   const { currentTileUrl, toggleTile, isSatellite } = useMapTiles();
-  const { vehicles, addVehicle } = useVehicles();
+  const { 
+    vehicles, 
+    addVehicle, 
+    selectedVehicleId, 
+    selectVehicle, 
+    setVehicleTarget 
+  } = useVehicles();
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
@@ -16,12 +22,22 @@ function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Side Panel */}
         <aside>
-          <VehiclePanel vehicles={vehicles} onAddVehicle={addVehicle} />
+          <VehiclePanel 
+            vehicles={vehicles} 
+            onAddVehicle={addVehicle} 
+            selectedVehicleId={selectedVehicleId}
+            onSelectVehicle={selectVehicle}
+          />
         </aside>
 
         {/* Main Map Content */}
         <main className="flex-grow relative">
-          <MapView currentTileUrl={currentTileUrl} vehicles={vehicles} />
+          <MapView 
+            currentTileUrl={currentTileUrl} 
+            vehicles={vehicles} 
+            selectedVehicleId={selectedVehicleId}
+            onSetTarget={setVehicleTarget}
+          />
         </main>
       </div>
     </div>
