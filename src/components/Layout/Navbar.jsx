@@ -1,83 +1,40 @@
 import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import MenuIcon from '@mui/icons-material/Menu';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { useStore } from '../../store/useStore';
 
-const Navbar = ({ isSatellite, onToggle, onMenuClick }) => {
+const Navbar = ({ onMenuClick }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const isSatellite = useStore(state => state.getIsSatellite());
+  const toggleTile = useStore(state => state.toggleTile);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#1a1a1a', boxShadow: 'none', borderBottom: '1px solid #333' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#1a1a1a', borderBottom: '1px solid #333' }}>
       <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
         {isMobile && (
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={onMenuClick}
-            sx={{ mr: 1 }}
-          >
+          <IconButton color="inherit" edge="start" onClick={onMenuClick} sx={{ mr: 1 }}>
             <MenuIcon />
           </IconButton>
         )}
-        
         <MapIcon sx={{ mr: { xs: 1, sm: 2 }, color: '#1976d2' }} />
-        
-        <Typography 
-          variant="h6" 
-          component="div" 
-          sx={{ 
-            flexGrow: 1, 
-            fontWeight: 'bold', 
-            letterSpacing: '0.5px',
-            fontSize: { xs: '0.9rem', sm: '1.25rem' }
-          }}
-        >
+        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1.25rem' } }}>
           {isMobile ? 'Vehicle Tracker' : 'React Vehicle Management System'}
         </Typography>
-
         <Box>
-          {isMobile ? (
-            <IconButton 
-              onClick={onToggle}
-              sx={{ 
-                color: '#ffffff',
-                border: '1px solid #444',
-                borderRadius: '8px',
-                '&:hover': { borderColor: '#1976d2' }
-              }}
-            >
-              {isSatellite ? <MapIcon /> : <SatelliteIcon />}
-            </IconButton>
-          ) : (
-            <Button
-              variant="outlined"
-              startIcon={isSatellite ? <MapIcon /> : <SatelliteIcon />}
-              onClick={onToggle}
-              sx={{
-                color: '#ffffff',
-                borderColor: '#444',
-                '&:hover': {
-                  borderColor: '#1976d2',
-                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                },
-                textTransform: 'none',
-                borderRadius: '8px',
-                px: 2,
-              }}
-            >
-              {isSatellite ? 'Standard' : 'Satellite'}
-            </Button>
-          )}
+          <Button
+            variant="outlined"
+            startIcon={isSatellite ? <MapIcon /> : <SatelliteIcon />}
+            onClick={toggleTile}
+            sx={{ color: '#fff', borderColor: '#444', textTransform: 'none' }}
+          >
+            {isMobile ? '' : (isSatellite ? 'Standard' : 'Satellite')}
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>

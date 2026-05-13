@@ -1,64 +1,57 @@
 import React from 'react';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
+import { ListItem, ListItemText, ListItemAvatar, Avatar, Typography, ListItemButton, Box } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import Chip from '@mui/material/Chip';
-
-const statusColors = {
-  idle: 'default',
-  moving: 'success',
-  arrived: 'primary'
-};
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'moving': return '#4caf50';
+      case 'arrived': return '#1976d2';
+      default: return '#9e9e9e';
+    }
+  };
+
   return (
-    <ListItem 
-      button
-      onClick={() => onSelect(vehicle.id)}
-      alignItems="flex-start" 
-      sx={{ 
-        borderBottom: '1px solid #eee',
-        backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
-        borderLeft: isSelected ? '4px solid #1976d2' : '4px solid transparent',
-        '&:hover': { backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.12)' : '#f9f9f9' }
-      }}
-    >
-      <ListItemAvatar>
-        <Avatar sx={{ bgcolor: vehicle.status === 'moving' ? '#4caf50' : (isSelected ? '#1976d2' : '#9e9e9e') }}>
-          <DirectionsCarIcon />
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={
-          <div className="flex justify-between items-center">
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: isSelected ? '#1976d2' : 'inherit' }}>
+    <ListItem disablePadding divider>
+      <ListItemButton 
+        selected={isSelected} 
+        onClick={() => onSelect(vehicle.id)}
+        sx={{
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+            borderLeft: '4px solid #1976d2',
+          }
+        }}
+      >
+        <ListItemAvatar>
+          <Avatar sx={{ bgcolor: isSelected ? '#1976d2' : '#f5f5f5', color: isSelected ? '#fff' : '#666' }}>
+            <DirectionsCarIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={
+            <Typography component="span" variant="body1" sx={{ fontWeight: 'bold', display: 'block' }}>
               {vehicle.name}
             </Typography>
-            <Chip 
-              label={vehicle.status} 
-              size="small" 
-              color={statusColors[vehicle.status]} 
-              variant={isSelected ? "filled" : "outlined"}
-            />
-          </div>
-        }
-        secondary={
-          <React.Fragment>
-            <Typography
-              sx={{ display: 'inline' }}
-              component="span"
-              variant="body2"
-              color="text.primary"
-            >
-              {vehicle.plate}
-            </Typography>
-            {" — Speed: " + vehicle.speed + " km/h"}
-          </React.Fragment>
-        }
-      />
+          }
+          secondary={
+            <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+              <Typography component="span" variant="body2" color="text.secondary">
+                {vehicle.plate}
+              </Typography>
+              <FiberManualRecordIcon sx={{ fontSize: 10, color: getStatusColor(vehicle.status) }} />
+              <Typography component="span" variant="caption" sx={{ textTransform: 'capitalize' }}>
+                {vehicle.status}
+              </Typography>
+            </Box>
+          }
+          secondaryTypographyProps={{ component: 'span' }} // Critical to avoid nested <p>
+        />
+        <Typography component="span" variant="caption" sx={{ color: '#666', fontWeight: 'bold', ml: 'auto' }}>
+          {vehicle.speed} km/h
+        </Typography>
+      </ListItemButton>
     </ListItem>
   );
 };
