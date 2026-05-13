@@ -8,20 +8,23 @@ const TILE_LAYERS = {
 
 const KONYA_COORDS = { lat: 37.8714, lng: 32.4846 };
 
-export const useStore = create((set, get) => ({
-  // TILE STATE
+// --- MAP SLICE ---
+const createMapSlice = (set, get) => ({
   tileType: 'standard',
   toggleTile: () => set((state) => ({ 
     tileType: state.tileType === 'standard' ? 'satellite' : 'standard' 
   })),
+  getTileUrl: () => TILE_LAYERS[get().tileType],
+  getIsSatellite: () => get().tileType === 'satellite',
+});
 
-  // VEHICLE STATE
+// --- VEHICLE SLICE ---
+const createVehicleSlice = (set, get) => ({
   vehicles: [
     { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }
   ],
   selectedVehicleId: null,
   
-  // Toggle selection logic: if ID is same, set to null
   selectVehicle: (id) => set((state) => ({ 
     selectedVehicleId: state.selectedVehicleId === id ? null : id 
   })),
@@ -35,22 +38,13 @@ export const useStore = create((set, get) => ({
       target: null
     }]
   })),
+
   setVehicleTarget: (id, lat, lng) => set((state) => ({
     vehicles: state.vehicles.map((v) => 
       v.id === id ? { ...v, target: { lat, lng }, status: 'moving' } : v
     )
   })),
 
-  // REGION STATE
-  searchResults: [],
-  selectedRegion: null,
-  regionLoading: false,
-  setRegionLoading: (loading) => set({ regionLoading: loading }),
-  setSearchResults: (results) => set({ searchResults: results }),
-  selectRegion: (region) => set({ selectedRegion: region, searchResults: [] }),
-  clearRegion: () => set({ selectedRegion: null, searchResults: [] }),
-
-  // SIMULATION LOGIC
   tick: () => {
     const { vehicles } = get();
     if (!vehicles.some(v => v.status === 'moving')) return;
@@ -67,8 +61,23 @@ export const useStore = create((set, get) => ({
       })
     }));
   },
+});
 
-  // Helper actions
-  getTileUrl: () => TILE_LAYERS[get().tileType],
-  getIsSatellite: () => get().tileType === 'satellite'
+// --- REGION SLICE ---
+const createRegionSlice = (set, get) => ({
+  searchResults: [],
+  selectedRegion: null,
+  regionLoading: false,
+  
+  setRegionLoading: (loading) => set({ regionLoading: loading }),
+  setSearchResults: (results) => set({ searchResults: results }),
+  selectRegion: (region) => set({ selectedRegion: region, searchResults: [] }),
+  clearRegion: () => set({ selectedRegion: null, searchResults: [] }),
+});
+
+// --- UNIFIED STORE ---
+export const useStore = create((...a) => ({
+  ...createMapSlice(...a),
+  ...createVehicleSlice(...a),
+  ...createRegionSlice(...a),
 }));
