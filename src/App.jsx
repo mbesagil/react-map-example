@@ -11,7 +11,16 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 const INITIAL_VEHICLES = [
-  { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: { lat: 37.8714, lng: 32.4846 }, target: null }
+  { id: 1, name: 'Siyah Binek', plate: '42 ABC 01', status: 'moving', speed: 85, type: 'car', position: { lat: 37.8714, lng: 32.4846 }, target: { lat: 37.90, lng: 32.50 } },
+  { id: 2, name: 'Hızlı Kurye', plate: '42 MOT 12', status: 'idle', speed: 45, type: 'motorcycle', position: { lat: 37.8800, lng: 32.4900 }, target: null },
+  { id: 3, name: 'Okul Servisi', plate: '42 SRV 44', status: 'moving', speed: 40, type: 'service', position: { lat: 37.8600, lng: 32.4700 }, target: { lat: 37.85, lng: 32.45 } },
+  { id: 4, name: 'Ağır Nakliye', plate: '42 KAM 99', status: 'idle', speed: 60, type: 'truck', position: { lat: 37.8500, lng: 32.5000 }, target: null },
+  { id: 5, name: 'Mavi Sedan', plate: '42 XYZ 23', status: 'moving', speed: 110, type: 'car', position: { lat: 37.8900, lng: 32.5100 }, target: { lat: 38.00, lng: 32.60 } },
+  { id: 6, name: 'Paket Servis', plate: '42 MOT 55', status: 'moving', speed: 35, type: 'motorcycle', position: { lat: 37.8750, lng: 32.4800 }, target: { lat: 37.88, lng: 32.48 } },
+  { id: 7, name: 'Personel Servis', plate: '42 SRV 08', status: 'idle', speed: 50, type: 'service', position: { lat: 37.8400, lng: 32.4600 }, target: null },
+  { id: 8, name: 'Hafriyat Kamyonu', plate: '42 KAM 11', status: 'moving', speed: 45, type: 'truck', position: { lat: 37.8300, lng: 32.4400 }, target: { lat: 37.80, lng: 32.40 } },
+  { id: 9, name: 'Beyaz SUV', plate: '42 SUV 77', status: 'idle', speed: 90, type: 'car', position: { lat: 37.9100, lng: 32.5200 }, target: null },
+  { id: 10, name: 'Lojistik Tırı', plate: '42 LOG 01', status: 'moving', speed: 70, type: 'truck', position: { lat: 37.9200, lng: 32.5500 }, target: { lat: 38.05, lng: 32.70 } }
 ];
 
 function App() {

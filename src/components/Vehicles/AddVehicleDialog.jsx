@@ -6,14 +6,18 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
+import MenuItem from '@mui/material/MenuItem';
+import { useTranslation } from 'react-i18next';
 
 const AddVehicleDialog = ({ open, onClose, onAdd }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     plate: '',
     latitude: '',
     longitude: '',
-    speed: ''
+    speed: '',
+    type: 'car'
   });
 
   const handleChange = (e) => {
@@ -23,13 +27,13 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onAdd(formData);
-    setFormData({ name: '', plate: '', latitude: '', longitude: '', speed: '' });
+    setFormData({ name: '', plate: '', latitude: '', longitude: '', speed: '', type: 'car' });
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: 'bold' }}>Add New Vehicle</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{t('add_vehicle')}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -37,7 +41,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
               <TextField
                 required
                 fullWidth
-                label="Vehicle Name"
+                label={t('vehicle_name')}
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -47,7 +51,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
               <TextField
                 required
                 fullWidth
-                label="Plate Number"
+                label={t('plate')}
                 name="plate"
                 value={formData.plate}
                 onChange={handleChange}
@@ -57,7 +61,34 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
               <TextField
                 required
                 fullWidth
-                label="Latitude"
+                select
+                label={t('vehicle_type')}
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+              >
+                <MenuItem value="car">{t('car')}</MenuItem>
+                <MenuItem value="motorcycle">{t('motorcycle')}</MenuItem>
+                <MenuItem value="service">{t('service')}</MenuItem>
+                <MenuItem value="truck">{t('truck')}</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                required
+                fullWidth
+                label={t('speed')}
+                name="speed"
+                type="number"
+                value={formData.speed}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                required
+                fullWidth
+                label={t('latitude')}
                 name="latitude"
                 type="number"
                 inputProps={{ step: "any" }}
@@ -69,7 +100,7 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
               <TextField
                 required
                 fullWidth
-                label="Longitude"
+                label={t('longitude')}
                 name="longitude"
                 type="number"
                 inputProps={{ step: "any" }}
@@ -77,22 +108,11 @@ const AddVehicleDialog = ({ open, onClose, onAdd }) => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Speed (km/h)"
-                name="speed"
-                type="number"
-                value={formData.speed}
-                onChange={handleChange}
-              />
-            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={onClose} color="inherit">Cancel</Button>
-          <Button type="submit" variant="contained" color="primary">Add Vehicle</Button>
+          <Button onClick={onClose} color="inherit">{t('cancel')}</Button>
+          <Button type="submit" variant="contained" color="primary">{t('add')}</Button>
         </DialogActions>
       </form>
     </Dialog>

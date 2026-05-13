@@ -1,6 +1,9 @@
 import React from 'react';
 import { ListItem, ListItemText, ListItemAvatar, Avatar, Typography, ListItemButton, Box } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +15,15 @@ const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
       case 'moving': return '#4caf50';
       case 'arrived': return '#1976d2';
       default: return '#9e9e9e';
+    }
+  };
+
+  const getVehicleIcon = (type) => {
+    switch (type) {
+      case 'motorcycle': return <TwoWheelerIcon />;
+      case 'service': return <DirectionsBusIcon />;
+      case 'truck': return <LocalShippingIcon />;
+      default: return <DirectionsCarIcon />;
     }
   };
 
@@ -29,7 +41,7 @@ const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
       >
         <ListItemAvatar>
           <Avatar sx={{ bgcolor: isSelected ? '#1976d2' : '#f5f5f5', color: isSelected ? '#fff' : '#666' }}>
-            <DirectionsCarIcon />
+            {getVehicleIcon(vehicle.type)}
           </Avatar>
         </ListItemAvatar>
         <ListItemText

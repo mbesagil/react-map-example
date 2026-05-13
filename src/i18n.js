@@ -31,7 +31,12 @@ const resources = {
       "vehicle_name": "Vehicle Name",
       "cancel": "Cancel",
       "latitude": "Latitude",
-      "longitude": "Longitude"
+      "longitude": "Longitude",
+      "car": "Car",
+      "motorcycle": "Motorcycle",
+      "service": "Service",
+      "truck": "Truck",
+      "vehicle_type": "Vehicle Type"
     }
   },
   tr: {
@@ -62,7 +67,12 @@ const resources = {
       "vehicle_name": "Araç Adı",
       "cancel": "İptal",
       "latitude": "Enlem",
-      "longitude": "Boylam"
+      "longitude": "Boylam",
+      "car": "Araba",
+      "motorcycle": "Motor",
+      "service": "Servis",
+      "truck": "Kamyon",
+      "vehicle_type": "Araç Tipi"
     }
   }
 };

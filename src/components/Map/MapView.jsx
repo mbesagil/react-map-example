@@ -9,10 +9,24 @@ import { Box, CircularProgress, Typography, useTheme, Button } from '@mui/materi
 import MapIcon from '@mui/icons-material/Map';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 
-const createCustomIcon = (color, isInside) => {
+const VEHICLE_PATHS = {
+  car: 'M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.27-3.82c.07-.21.27-.38.52-.38h10.42c.25 0 .45.17.52.38L19 11H5z',
+  motorcycle: 'M18 10h-1.07l-3.37-5.05c-.32-.47-.85-.75-1.42-.75H7.5c-.83 0-1.5.67-1.5 1.5S6.67 6.5 7.5 6.5h3.9l2.33 3.5H7c-1.66 0-3 1.34-3 3v2c0 1.66 1.34 3 3 3h10c1.66 0 3-1.34 3-3v-2c0-1.66-1.34-3-3-3zM7 16c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm10 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z',
+  service: 'M12 2c-4.42 0-8 3.58-8 8v10c0 1.1.9 2 2 2h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c1.1 0 2-.9 2-2V10c0-4.42-3.58-8-8-8zm-4 15c-.83 0-1.5-.67-1.5-1.5S7.17 14 8 14s1.5.67 1.5 1.5S8.83 17 8 17zm8 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM18 11H6V7h12v4z',
+  truck: 'M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2-1h-1.18C18.42 16.2 17.78 15.6 17 15.6c-.78 0-1.42.6-1.82 1.4H9.82C9.42 16.2 8.78 15.6 8 15.6c-.78 0-1.42.6-1.82 1.4H3V6h12v5h5v6z'
+};
+
+const createCustomIcon = (color, isInside, type = 'car') => {
   const halo = isInside ? `<circle cx="12" cy="9" r="10" stroke="${color}" stroke-width="2" stroke-dasharray="2,2" opacity="0.5"><animate attributeName="r" from="8" to="12" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" /></circle>` : '';
+  const innerIconPath = VEHICLE_PATHS[type] || VEHICLE_PATHS.car;
   return L.divIcon({
-    html: `<svg width="40" height="40" viewBox="-8 -8 40 40" fill="none">${halo}<path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="${color}" stroke="white" stroke-width="1.5"/><circle cx="12" cy="9" r="3" fill="white"/></svg>`,
+    html: `<svg width="40" height="40" viewBox="-8 -8 40 40" fill="none">
+      ${halo}
+      <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="${color}" stroke="white" stroke-width="1.5"/>
+      <g transform="translate(8.5, 5.5) scale(0.3)">
+        <path d="${innerIconPath}" fill="white"/>
+      </g>
+    </svg>`,
     className: 'custom-marker-icon', iconSize: [40, 40], iconAnchor: [20, 30], popupAnchor: [0, -30]
   });
 };
@@ -146,7 +160,7 @@ const MapView = () => {
               return (
                 <React.Fragment key={v.id}>
                   {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
-                  <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
+                  <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside, v.type)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
                     <Popup><div className="p-1 text-sm"><h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3><p>{t('plate')}: {v.plate}</p>{isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}</div></Popup>
                   </Marker>
                 </React.Fragment>
