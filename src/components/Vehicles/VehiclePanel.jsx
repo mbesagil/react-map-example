@@ -1,44 +1,104 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, List, Divider, useTheme, Skeleton } from '@mui/material';
+import { 
+  Box, Typography, Button, List, Divider, useTheme, Skeleton, 
+  ButtonGroup, Tooltip, TextField, InputAdornment 
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import SpeedIcon from '@mui/icons-material/Speed';
 import VehicleItem from './VehicleItem';
 import AddVehicleDialog from './AddVehicleDialog';
-import { useStore } from '../../store/useStore';
+import useVehicles from '../../hooks/useVehicles';
 import { useTranslation } from 'react-i18next';
 
 const VehiclePanel = ({ onSelectVehicle, children }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const vehicles = useStore(state => state.vehicles);
-  const vehiclesLoading = useStore(state => state.vehiclesLoading);
-  const addVehicle = useStore(state => state.addVehicle);
-  const selectedVehicleId = useStore(state => state.selectedVehicleId);
-  const selectVehicle = useStore(state => state.selectVehicle);
+  const [bulkSpeed, setBulkSpeed] = useState(80);
+  
+  const {
+    vehicles,
+    vehiclesLoading,
+    selectedVehicleId,
+    addVehicle,
+    startAllVehicles,
+    stopAllVehicles,
+    deleteAllVehicles,
+    updateAllSpeeds,
+    selectVehicle,
+    startVehicle,
+    stopVehicle,
+    deleteVehicle,
+    updateVehicleSpeed
+  } = useVehicles();
 
   const handleSelect = (id) => {
     selectVehicle(id);
     if (onSelectVehicle) onSelectVehicle(id);
   };
 
+  const confirmDeleteAll = () => {
+    if (window.confirm(t('confirm_delete_all'))) {
+      deleteAllVehicles();
+    }
+  };
+
   return (
     <Box sx={{ 
-      width: 320, 
+      width: 340, 
       height: '100%', 
       display: 'flex', 
       flexDirection: 'column', 
       bgcolor: theme.palette.background.paper,
       borderRight: `1px solid ${theme.palette.divider}`
     }}>
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
+      {/* Header & Bulk Actions */}
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
         <div className="flex justify-between items-center">
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t('vehicles')}</Typography>
           <Button variant="contained" size="small" disabled={vehiclesLoading} startIcon={<AddIcon />} onClick={() => setIsDialogOpen(true)}>{t('add')}</Button>
         </div>
+
+        {/* Bulk Control System */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <ButtonGroup fullWidth variant="outlined" size="small">
+            <Tooltip title={t('start_all')}>
+              <Button color="success" onClick={startAllVehicles}><PlayArrowIcon /></Button>
+            </Tooltip>
+            <Tooltip title={t('stop_all')}>
+              <Button color="warning" onClick={stopAllVehicles}><StopIcon /></Button>
+            </Tooltip>
+            <Tooltip title={t('delete_all')}>
+              <Button color="error" onClick={confirmDeleteAll}><DeleteSweepIcon /></Button>
+            </Tooltip>
+          </ButtonGroup>
+          
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              size="small"
+              type="number"
+              value={bulkSpeed}
+              onChange={(e) => setBulkSpeed(e.target.value)}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><SpeedIcon fontSize="small" /></InputAdornment>,
+                endAdornment: <InputAdornment position="end">km/h</InputAdornment>,
+              }}
+              sx={{ flex: 1 }}
+            />
+            <Button variant="outlined" size="small" onClick={() => updateAllSpeeds(bulkSpeed)}>{t('apply')}</Button>
+          </Box>
+        </Box>
+
         {selectedVehicleId && <Typography variant="caption" color="primary" sx={{ fontWeight: 'bold' }}>{t('click_map_target')}</Typography>}
-        <Box sx={{ mt: 2 }}>{children}</Box>
+        <Box sx={{ mt: 1 }}>{children}</Box>
       </Box>
+
       <Divider />
+
+      {/* Vehicle List */}
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
         {vehiclesLoading ? (
           <Box sx={{ p: 2 }}>
@@ -57,7 +117,16 @@ const VehiclePanel = ({ onSelectVehicle, children }) => {
         ) : (
           <List sx={{ p: 0 }}>
             {vehicles.map((v) => (
-              <VehicleItem key={v.id} vehicle={v} isSelected={v.id === selectedVehicleId} onSelect={handleSelect} />
+              <VehicleItem 
+                key={v.id} 
+                vehicle={v} 
+                isSelected={v.id === selectedVehicleId} 
+                onSelect={handleSelect}
+                onStart={startVehicle}
+                onStop={stopVehicle}
+                onDelete={deleteVehicle}
+                onSpeedChange={updateVehicleSpeed}
+              />
             ))}
           </List>
         )}

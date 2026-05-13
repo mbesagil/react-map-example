@@ -18,12 +18,27 @@ const VEHICLE_PATHS = {
   truck: 'M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2-1h-1.18C18.42 16.2 17.78 15.6 17 15.6c-.78 0-1.42.6-1.82 1.4H9.82C9.42 16.2 8.78 15.6 8 15.6c-.78 0-1.42.6-1.82 1.4H3V6h12v5h5v6z'
 };
 
-const createCustomIcon = (color, isInside, type = 'car') => {
+const COLORS = { 
+  GRAY: '#9e9e9e', 
+  BLUE: '#1976d2', 
+  GREEN: '#4caf50', 
+  ORANGE: '#ed6c02',
+  REGION: '#ff5722' 
+};
+
+const createCustomIcon = (color, isInside, type = 'car', status = 'idle') => {
+  const isMoving = status === 'moving';
   const halo = isInside ? `<circle cx="12" cy="9" r="10" stroke="${color}" stroke-width="2" stroke-dasharray="2,2" opacity="0.5"><animate attributeName="r" from="8" to="12" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" /></circle>` : '';
+  
+  // Moving indicator (pulsating background circle)
+  const movingPulse = isMoving ? `<circle cx="12" cy="9" r="6" fill="${color}" opacity="0.3"><animate attributeName="r" from="4" to="14" dur="2s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.3" to="0" dur="2s" repeatCount="indefinite" /></circle>` : '';
+
   const innerIconPath = VEHICLE_PATHS[type] || VEHICLE_PATHS.car;
+  
   return L.divIcon({
     html: `<svg width="40" height="40" viewBox="-8 -8 40 40" fill="none">
       ${halo}
+      ${movingPulse}
       <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="${color}" stroke="white" stroke-width="1.5"/>
       <g transform="translate(8.5, 5.5) scale(0.3)">
         <path d="${innerIconPath}" fill="white"/>
@@ -33,14 +48,11 @@ const createCustomIcon = (color, isInside, type = 'car') => {
   });
 };
 
-const COLORS = { GRAY: '#9e9e9e', BLUE: '#1976d2', GREEN: '#4caf50', REGION: '#ff5722' };
-
 const MapClickHandler = () => {
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
   const setVehicleTarget = useStore(state => state.setVehicleTarget);
   useMapEvents({ 
     click: (e) => { 
-      // Prevent click if it originated from a control
       if (e.originalEvent.target.closest('.mui-map-control') || e.originalEvent.target.closest('.leaflet-control')) {
         return;
       }
@@ -114,6 +126,16 @@ const MapView = () => {
     return vehicles.filter(v => isPointInPolygon(v.position, selectedRegion.geojson)).map(v => v.id);
   }, [vehicles, selectedRegion]);
 
+  const getVehicleColor = (vehicle, isSelected) => {
+    if (isSelected) return COLORS.BLUE;
+    switch (vehicle.status) {
+      case 'moving': return COLORS.GREEN;
+      case 'stopped': return COLORS.ORANGE;
+      case 'arrived': return COLORS.BLUE;
+      default: return COLORS.GRAY;
+    }
+  };
+
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
       {/* Map Type Switcher Floating Button */}
@@ -164,13 +186,29 @@ const MapView = () => {
             {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
             {vehicles.map((v) => {
               const isSelected = v.id === selectedVehicleId;
-              const color = v.status === 'moving' ? COLORS.GREEN : (isSelected ? COLORS.BLUE : COLORS.GRAY);
+              const color = getVehicleColor(v, isSelected);
               const isInside = insideIds.includes(v.id);
               return (
                 <React.Fragment key={v.id}>
-                  {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
-                  <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside, v.type)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
-                    <Popup><div className="p-1 text-sm"><h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3><p>{t('plate')}: {v.plate}</p>{isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}</div></Popup>
+                  {v.target && v.status !== 'arrived' && (
+                    <Polyline 
+                      positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} 
+                      color={isSelected ? COLORS.BLUE : COLORS.GRAY} 
+                      dashArray="5, 10" 
+                      weight={2} 
+                      opacity={0.6}
+                    />
+                  )}
+                  <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside, v.type, v.status)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
+                    <Popup>
+                      <div className="p-1 text-sm">
+                        <h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3>
+                        <p>{t('plate')}: {v.plate}</p>
+                        <p>{t('speed')}: {v.speed} km/h</p>
+                        <p>{t('status')}: <span style={{ color, fontWeight: 'bold' }}>{t(v.status)}</span></p>
+                        {isInside && <p className="text-green-600 font-bold">{t('inside_polygon')}</p>}
+                      </div>
+                    </Popup>
                   </Marker>
                 </React.Fragment>
               );

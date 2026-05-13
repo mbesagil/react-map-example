@@ -46,7 +46,17 @@ const resources = {
       "draw_area": "Draw Area",
       "finish": "Finish",
       "delete_last_point": "Delete Last Point",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "start": "Start",
+      "stop": "Stop",
+      "delete": "Delete",
+      "start_all": "Start All",
+      "stop_all": "Stop All",
+      "delete_all": "Delete All",
+      "set_all_speed": "Set All Speed",
+      "confirm_delete_all": "Are you sure you want to delete all vehicles?",
+      "stopped": "stopped",
+      "apply": "Apply"
     }
   },
   tr: {
@@ -92,7 +102,17 @@ const resources = {
       "draw_area": "Alan Çiz",
       "finish": "Bitir",
       "delete_last_point": "Son Noktayı Sil",
-      "cancel": "İptal"
+      "cancel": "İptal",
+      "start": "Başlat",
+      "stop": "Durdur",
+      "delete": "Sil",
+      "start_all": "Tümünü Başlat",
+      "stop_all": "Tümünü Durdur",
+      "delete_all": "Tümünü Sil",
+      "set_all_speed": "Hızı Tümüne Uygula",
+      "confirm_delete_all": "Tüm araçları silmek istediğinize emin misiniz?",
+      "stopped": "durduruldu",
+      "apply": "Uygula"
     }
   }
 };
