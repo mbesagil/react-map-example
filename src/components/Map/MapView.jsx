@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet-draw';
 import { useStore } from '../../store/useStore';
 import { isPointInPolygon } from '../../utils/geo';
 
@@ -13,6 +14,58 @@ const createCustomIcon = (color, isInside) => {
 };
 
 const COLORS = { GRAY: '#9e9e9e', BLUE: '#1976d2', GREEN: '#4caf50', REGION: '#ff5722' };
+
+const DrawTools = () => {
+  const map = useMap();
+  const setDrawnPolygon = useStore(state => state.setDrawnPolygon);
+  const clearRegion = useStore(state => state.clearRegion);
+  const drawnItemsRef = useRef(new L.FeatureGroup());
+
+  useEffect(() => {
+    const drawnItems = drawnItemsRef.current;
+    map.addLayer(drawnItems);
+
+    const drawControl = new L.Control.Draw({
+      edit: { featureGroup: drawnItems, remove: true },
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: false, // Set to false to avoid "type is not defined" error in leaflet-draw
+          shapeOptions: { color: COLORS.REGION }
+        },
+        rectangle: false, circle: false, circlemarker: false, marker: false, polyline: false,
+      }
+    });
+
+    map.addControl(drawControl);
+
+    const onCreated = (e) => {
+      drawnItems.clearLayers();
+      drawnItems.addLayer(e.layer);
+      setDrawnPolygon(e.layer.toGeoJSON().geometry);
+    };
+
+    const onEdited = (e) => {
+      e.layers.eachLayer(layer => setDrawnPolygon(layer.toGeoJSON().geometry));
+    };
+
+    const onDeleted = () => clearRegion();
+
+    map.on(L.Draw.Event.CREATED, onCreated);
+    map.on(L.Draw.Event.EDITED, onEdited);
+    map.on(L.Draw.Event.DELETED, onDeleted);
+
+    return () => {
+      map.removeControl(drawControl);
+      map.off(L.Draw.Event.CREATED, onCreated);
+      map.off(L.Draw.Event.EDITED, onEdited);
+      map.off(L.Draw.Event.DELETED, onDeleted);
+      map.removeLayer(drawnItems);
+    };
+  }, [map, setDrawnPolygon, clearRegion]);
+
+  return null;
+};
 
 const MapClickHandler = () => {
   const selectedVehicleId = useStore(state => state.selectedVehicleId);
@@ -34,14 +87,14 @@ const CenterMap = ({ position, selectedVehicleId }) => {
   return null;
 };
 
-const RegionLayer = () => {
+const SearchedRegionLayer = () => {
   const map = useMap();
   const selectedRegion = useStore(state => state.selectedRegion);
   const layerGroupRef = useRef(L.layerGroup());
   useEffect(() => {
     layerGroupRef.current.addTo(map);
     layerGroupRef.current.clearLayers();
-    if (selectedRegion?.geojson) {
+    if (selectedRegion?.source === 'search' && selectedRegion.geojson) {
       const layer = L.geoJSON(selectedRegion.geojson, { style: { color: COLORS.REGION, weight: 2, fillColor: COLORS.REGION, fillOpacity: 0.2 } });
       layer.addTo(layerGroupRef.current);
       map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 12, animate: true });
@@ -68,7 +121,8 @@ const MapView = () => {
     <MapContainer center={[39.9208, 32.8541]} zoom={6} className="w-full h-full" style={{ height: '100%', width: '100%' }}>
       <TileLayer url={tileUrl} />
       <MapClickHandler />
-      <RegionLayer />
+      <SearchedRegionLayer />
+      <DrawTools />
       {selectedVehicle && <CenterMap position={selectedVehicle.position} selectedVehicleId={selectedVehicleId} />}
       {vehicles.map((v) => {
         const isSelected = v.id === selectedVehicleId;
@@ -77,17 +131,8 @@ const MapView = () => {
         return (
           <React.Fragment key={v.id}>
             {v.target && <Polyline positions={[[v.position.lat, v.position.lng], [v.target.lat, v.target.lng]]} color={isSelected ? "#1976d2" : "#666"} dashArray="5, 10" weight={2} />}
-            <Marker 
-              position={[v.position.lat, v.position.lng]} 
-              icon={createCustomIcon(color, isInside)}
-              eventHandlers={{ click: () => selectVehicle(v.id) }}
-            >
-              <Popup>
-                <div className="p-1">
-                  <strong>{v.name}</strong><br/>Plate: {v.plate}<br/>Status: {v.status}
-                  {isInside && <div style={{ color: '#2e7d32', fontWeight: 'bold' }}>📍 Inside Polygon</div>}
-                </div>
-              </Popup>
+            <Marker position={[v.position.lat, v.position.lng]} icon={createCustomIcon(color, isInside)} eventHandlers={{ click: () => selectVehicle(v.id) }}>
+              <Popup><div className="p-1 text-sm"><h3 className="font-bold text-lg" style={{ color }}>{v.name}</h3><p>Plate: {v.plate}</p>{isInside && <p className="text-green-600 font-bold">Inside Polygon</p>}</div></Popup>
             </Marker>
           </React.Fragment>
         );

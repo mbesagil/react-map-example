@@ -25,7 +25,6 @@ const GeoFencePanel = () => {
 
   const stats = useMemo(() => {
     if (!selectedRegion?.geojson) return null;
-    
     const inside = vehicles.filter(v => isPointInPolygon(v.position, selectedRegion.geojson));
     return {
       total: vehicles.length,
@@ -45,37 +44,17 @@ const GeoFencePanel = () => {
         <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Analytics: {selectedRegion.display_name.split(',')[0]}</Typography>
       </Box>
       <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <StatCard 
-            title="Inside" 
-            value={stats.insideCount} 
-            icon={<GpsFixedIcon sx={{ fontSize: 16, color: '#4caf50' }} />} 
-            color="#4caf50" 
-          />
+        <Grid item="true" xs={6}>
+          <StatCard title="Inside" value={stats.insideCount} icon={<GpsFixedIcon sx={{ fontSize: 16, color: '#4caf50' }} />} color="#4caf50" />
         </Grid>
-        <Grid item xs={6}>
-          <StatCard 
-            title="Outside" 
-            value={stats.outsideCount} 
-            icon={<GpsOffIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />} 
-            color="#9e9e9e" 
-          />
+        <Grid item="true" xs={6}>
+          <StatCard title="Outside" value={stats.outsideCount} icon={<GpsOffIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />} color="#9e9e9e" />
         </Grid>
-        <Grid item xs={6}>
-          <StatCard 
-            title="Moving" 
-            value={stats.movingInside} 
-            icon={<PlayCircleFilledIcon sx={{ fontSize: 16, color: '#2e7d32' }} />} 
-            color="#2e7d32" 
-          />
+        <Grid item="true" xs={6}>
+          <StatCard title="Moving" value={stats.movingInside} icon={<PlayCircleFilledIcon sx={{ fontSize: 16, color: '#2e7d32' }} />} color="#2e7d32" />
         </Grid>
-        <Grid item xs={6}>
-          <StatCard 
-            title="Idle" 
-            value={stats.idleInside} 
-            icon={<PauseCircleFilledIcon sx={{ fontSize: 16, color: '#ed6c02' }} />} 
-            color="#ed6c02" 
-          />
+        <Grid item="true" xs={6}>
+          <StatCard title="Idle" value={stats.idleInside} icon={<PauseCircleFilledIcon sx={{ fontSize: 16, color: '#ed6c02' }} />} color="#ed6c02" />
         </Grid>
       </Grid>
     </Box>

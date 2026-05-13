@@ -46,7 +46,7 @@ const VehicleItem = ({ vehicle, isSelected, onSelect }) => {
               </Typography>
             </Box>
           }
-          secondaryTypographyProps={{ component: 'span' }} // Critical to avoid nested <p>
+          slotProps={{ secondary: { component: 'span' } }} // MUI v6 standard or v5 slot compatible
         />
         <Typography component="span" variant="caption" sx={{ color: '#666', fontWeight: 'bold', ml: 'auto' }}>
           {vehicle.speed} km/h

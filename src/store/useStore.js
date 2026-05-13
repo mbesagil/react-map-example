@@ -24,11 +24,7 @@ const createVehicleSlice = (set, get) => ({
     { id: 1, name: 'Konya Express', plate: '42 ABC 42', status: 'idle', speed: 60, position: KONYA_COORDS, target: null }
   ],
   selectedVehicleId: null,
-  
-  selectVehicle: (id) => set((state) => ({ 
-    selectedVehicleId: state.selectedVehicleId === id ? null : id 
-  })),
-
+  selectVehicle: (id) => set((state) => ({ selectedVehicleId: state.selectedVehicleId === id ? null : id })),
   addVehicle: (vehicleData) => set((state) => ({
     vehicles: [...state.vehicles, {
       id: Date.now(),
@@ -38,40 +34,52 @@ const createVehicleSlice = (set, get) => ({
       target: null
     }]
   })),
-
   setVehicleTarget: (id, lat, lng) => set((state) => ({
-    vehicles: state.vehicles.map((v) => 
-      v.id === id ? { ...v, target: { lat, lng }, status: 'moving' } : v
-    )
+    vehicles: state.vehicles.map((v) => v.id === id ? { ...v, target: { lat, lng }, status: 'moving' } : v)
   })),
-
   tick: () => {
     const { vehicles } = get();
     if (!vehicles.some(v => v.status === 'moving')) return;
-
     set((state) => ({
       vehicles: state.vehicles.map((v) => {
         if (v.status !== 'moving' || !v.target) return v;
         const next = calculateNextPosition(v.position, v.target, parseFloat(v.speed), 1);
-        return {
-          ...v,
-          position: { lat: next.lat, lng: next.lng },
-          status: next.arrived ? 'arrived' : 'moving'
-        };
+        return { ...v, position: { lat: next.lat, lng: next.lng }, status: next.arrived ? 'arrived' : 'moving' };
       })
     }));
   },
 });
 
-// --- REGION SLICE ---
+// --- REGION/DRAW SLICE ---
 const createRegionSlice = (set, get) => ({
   searchResults: [],
   selectedRegion: null,
   regionLoading: false,
   
+  // Handlers
   setRegionLoading: (loading) => set({ regionLoading: loading }),
   setSearchResults: (results) => set({ searchResults: results }),
-  selectRegion: (region) => set({ selectedRegion: region, searchResults: [] }),
+  
+  // Select Search Region (replaces everything else)
+  selectRegion: (region) => set({ 
+    selectedRegion: {
+      ...region,
+      source: 'search' // Tag the source
+    }, 
+    searchResults: [] 
+  }),
+
+  // Set Manually Drawn Polygon (replaces everything else)
+  setDrawnPolygon: (geojson) => set({
+    selectedRegion: {
+      display_name: 'Manually Drawn Area',
+      geojson: geojson,
+      source: 'draw',
+      place_id: 'manual-' + Date.now()
+    },
+    searchResults: []
+  }),
+
   clearRegion: () => set({ selectedRegion: null, searchResults: [] }),
 });
 

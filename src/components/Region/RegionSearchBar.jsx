@@ -34,11 +34,13 @@ const RegionSearchBar = () => {
         <TextField
           fullWidth size="small" placeholder="Search region..."
           value={query} onChange={(e) => setQuery(e.target.value)}
-          InputProps={{
-            startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
-            endAdornment: <InputAdornment position="end">
-              {regionLoading ? <CircularProgress size={20} /> : (query && <IconButton size="small" onClick={handleClear}><ClearIcon fontSize="small" /></IconButton>)}
-            </InputAdornment>
+          slotProps={{
+            input: {
+              startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
+              endAdornment: <InputAdornment position="end">
+                {regionLoading ? <CircularProgress size={20} /> : (query && <IconButton size="small" onClick={handleClear}><ClearIcon fontSize="small" /></IconButton>)}
+              </InputAdornment>
+            }
           }}
         />
       </form>
@@ -46,8 +48,27 @@ const RegionSearchBar = () => {
         <Paper elevation={3} sx={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1100, mt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
           <List dense>
             {searchResults.map((r) => (
-              <ListItem button key={r.place_id} onClick={() => { selectRegion(r); setQuery(r.display_name); }}>
-                <ListItemText primary={r.display_name} secondary={r.type} primaryTypographyProps={{ variant: 'body2', noWrap: true }} />
+              <ListItem 
+                key={r.place_id} 
+                disablePadding
+              >
+                <Box 
+                  component="div" 
+                  onClick={() => { selectRegion(r); setQuery(r.display_name); }}
+                  sx={{ 
+                    width: '100%', 
+                    px: 2, 
+                    py: 1, 
+                    cursor: 'pointer', 
+                    '&:hover': { bgcolor: 'action.hover' } 
+                  }}
+                >
+                  <ListItemText 
+                    primary={r.display_name} 
+                    secondary={r.type} 
+                    slotProps={{ primary: { noWrap: true, variant: 'body2' } }}
+                  />
+                </Box>
               </ListItem>
             ))}
           </List>
